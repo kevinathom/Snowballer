@@ -3,10 +3,11 @@ library(httr)
 library(jsonlite)
 
 # Set data directory
-setwd('~\Documents\GitHub\Snowballer\data') # hard-coded example
+setwd('~/Documents/GitHub/Snowballer/data') # hard-coded example
 
 # Get work entity ID(s)
 seed_ids <- c('W3125944002') # hard-coded example
+my_email <- 'kevinat@wharton.upenn.edu' # hard-coded example
 
 # Get works cited/citing
 oal_domain <- 'https://api.openalex.org/'
@@ -20,7 +21,7 @@ for(sid in seed_ids){
   ## Get cited_by works then cites works
   for(cit in c('cited_by', 'cites')){
     ## Get result count
-    pgraw <- GET(paste0(oal_domain, 'works?per-page=1&page=1&select=id&filter=', cit, ':', sid))
+    pgraw <- GET(paste0(oal_domain, 'works?mailto=', my_email, 'per-page=1&page=1&select=id&filter=', cit, ':', sid))
     pgdat <- fromJSON(rawToChar(pgraw$content))
     cit_count <- pgdat$meta$count
     ## If there are citations
@@ -33,7 +34,7 @@ for(sid in seed_ids){
         ## Stay at or below 200 results per page
         pg <- pg + 1
         ## Get one page of results
-        pgraw <- GET(paste0(oal_domain, 'works?per-page=', ppg, '&page=', pg, '&select=', fields_to_return, '&filter=', cit, ':', sid))
+        pgraw <- GET(paste0(oal_domain, 'works?mailto=', my_email, 'per-page=', ppg, '&page=', pg, '&select=', fields_to_return, '&filter=', cit, ':', sid))
         pgdat <- fromJSON(rawToChar(pgraw$content))$results
         ## Add latest page of results to the full results
         result <- rbind(result, pgdat)
@@ -50,4 +51,4 @@ for(sid in seed_ids){
 }
 
 ## Clean up temporary objects
-rm('cit', 'cit_count', 'fields_to_return', 'oal_domain', 'pg', 'pgdat', 'pgraw', 'ppg', 'result', 'seeds_ids', 'sid')
+rm('cit', 'cit_count', 'fields_to_return', 'my_email', 'oal_domain', 'pg', 'pgdat', 'pgraw', 'ppg', 'result', 'seed_ids', 'sid')
