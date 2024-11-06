@@ -48,3 +48,6 @@ for(sid in seed_ids){
   ## Reset results storage
   result <- result[0, ]
 }
+
+## Clean up temporary objects
+rm('cit', 'cit_count', 'fields_to_return', 'oal_domain', 'pg', 'pgdat', 'pgraw', 'ppg', 'result', 'seeds_ids', 'sid')
