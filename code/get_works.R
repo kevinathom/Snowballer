@@ -2,12 +2,15 @@
 library(httr)
 library(jsonlite)
 
+# Set data directory
+setwd('~\Documents\GitHub\Snowballer\data') # hard-coded example
+
 # Get work entity ID(s)
 seed_ids <- c('W3125944002') # hard-coded example
 
 # Get works cited/citing
 oal_domain <- 'https://api.openalex.org/'
-fields_to_return <- c('id,doi,title,publication_year,language,type,is_retracted')
+fields_to_return <- c('id,doi,title,publication_year,language,type,is_retracted') # hard-coded example
 ## Initialize results storage
 result <- as.data.frame(matrix(nrow = 0,
                                ncol = length(strsplit(fields_to_return, ",")[[1]]),
@@ -37,4 +40,11 @@ for(sid in seed_ids){
       }
     }
   }
+  ## Write results to file (to conserve memory)
+  write.table(result, 
+              file = paste0(sid, '.txt'),
+              sep = '|',
+              row.names = FALSE)
+  ## Reset results storage
+  result <- result[0, ]
 }
