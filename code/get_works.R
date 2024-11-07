@@ -12,8 +12,6 @@ my_email <- 'kevinat@wharton.upenn.edu' # hard-coded example
 # Get works cited/citing
 oal_domain <- 'https://api.openalex.org/'
 fields_to_return <- c('id,doi,title,publication_year,language,type,is_retracted') # hard-coded example
-### For testing
-pulls <- c()
 ## For each work entity ID
 for(sid in seed_ids){
   # Initialize results storage (to file)
@@ -26,7 +24,7 @@ for(sid in seed_ids){
   # Get cited_by works then cites works
   for(cit in c('cited_by', 'cites')){
     # Get result count
-    pgraw <- GET(paste0(oal_domain, 'works?mailto=', my_email, 'per-page=1&page=1&select=id&filter=', cit, ':', sid))
+    pgraw <- GET(paste0(oal_domain, 'works?mailto=', my_email, '&per-page=1&page=1&select=id&filter=', cit, ':', sid))
     Sys.sleep(.1) # Obey public API rate limit of max 10 requests per second
     pgdat <- fromJSON(rawToChar(pgraw$content))
     cit_count <- pgdat$meta$count
@@ -40,11 +38,9 @@ for(sid in seed_ids){
         # Stay at or below 200 results per page
         pg <- pg + 1
         # Get one page of results
-        pgraw <- GET(paste0(oal_domain, 'works?mailto=', my_email, 'per-page=', ppg, '&page=', pg, '&select=', fields_to_return, '&filter=', cit, ':', sid))
+        pgraw <- GET(paste0(oal_domain, 'works?mailto=', my_email, '&per-page=', ppg, '&page=', pg, '&select=', fields_to_return, '&filter=', cit, ':', sid))
         Sys.sleep(.1) # Obey public API rate limit of max 10 requests per second
         pgdat <- fromJSON(rawToChar(pgraw$content))$results
-        ### For testing
-        pulls <- c(pulls, paste('type:', cit, 'pg:', pg, 'results', nrow(pgdat)))
         # Append latest page of results to the results file
         write.table(pgdat, 
                     file = paste0(sid, '.txt'),
