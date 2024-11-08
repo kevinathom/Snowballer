@@ -6,6 +6,6 @@ my_email <- 'kevinat@wharton.upenn.edu'
 
 # Set directories
 ## Data
-data_dir <- '~/Documents/GitHub/Snowballer/data'
+data_dir <- '~/GitHub/Snowballer/data/'
 ## Code
-code_dir <- '~/Documents/GitHub/Snowballer/code'
+code_dir <- '~/GitHub/Snowballer/code/'
