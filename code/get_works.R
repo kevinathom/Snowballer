@@ -2,12 +2,8 @@
 library(httr)
 library(jsonlite)
 
-# Set data directory
-setwd('~/Documents/GitHub/Snowballer/data') # hard-coded example
-
 # Get work entity ID(s)
 seed_ids <- c('W3125944002') # hard-coded example
-my_email <- 'kevinat@wharton.upenn.edu' # hard-coded example
 
 # Get works cited/citing
 oal_domain <- 'https://api.openalex.org/'
@@ -18,7 +14,7 @@ for(sid in seed_ids){
   write.table(as.data.frame(matrix(nrow = 0,
                                    ncol = length(strsplit(fields_to_return, ",")[[1]]),
                                    dimnames = list(NULL, strsplit(fields_to_return, ",")[[1]]))), 
-              file = paste0(sid, '.txt'),
+              file = paste0(data_dir, sid, '.txt'),
               sep = '|',
               row.names = FALSE)
   # Get cited_by works then cites works
@@ -43,7 +39,7 @@ for(sid in seed_ids){
         pgdat <- fromJSON(rawToChar(pgraw$content))$results
         # Append latest page of results to the results file
         write.table(pgdat, 
-                    file = paste0(sid, '.txt'),
+                    file = paste0(data_dir, sid, '.txt'),
                     append = TRUE,
                     sep = '|',
                     row.names = FALSE,
@@ -61,7 +57,7 @@ for(sid in seed_ids){
   write.table(as.data.frame(matrix(nrow = 0,
                                    ncol = length(strsplit(fields_to_return, ",")[[1]]),
                                    dimnames = list(NULL, strsplit(fields_to_return, ",")[[1]]))), 
-              file = paste0(sid, '.txt'),
+              file = paste0(data_dir, sid, '.txt'),
               sep = '|',
               row.names = FALSE)
   # Get cited_by works then cites works
@@ -88,7 +84,7 @@ for(sid in seed_ids){
         pulls <- c(pulls, paste('type:', cit, 'pg:', pg, 'results', nrow(pgdat)))
         # Append latest page of results to the results file
         write.table(pgdat, 
-                    file = paste0(sid, '.txt'),
+                    file = paste0(data_dir, sid, '.txt'),
                     append = TRUE,
                     sep = '|',
                     row.names = FALSE,
@@ -99,4 +95,4 @@ for(sid in seed_ids){
 }
 
 # Clean up temporary objects
-rm('cit', 'cit_count', 'fields_to_return', 'my_email', 'oal_domain', 'pg', 'pgdat', 'pgraw', 'ppg', 'seed_ids', 'sid')
+rm('cit', 'cit_count', 'fields_to_return', 'oal_domain', 'pg', 'pgdat', 'pgraw', 'ppg', 'seed_ids', 'sid')
