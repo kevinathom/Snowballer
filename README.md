@@ -12,6 +12,8 @@ Snowballer tool automates snowball literature searches
       1. Long query or loop to get all works
    1. Get works that cite the entity (`cites` filter) -- repeat steps under parallel entry above
 1. Deduplicate works
+   1. Load all results
+   1. Remove where row !duplicated()
 
 ## Sample calls
 - Seed article: `https://openalex.org/W3125944002`
