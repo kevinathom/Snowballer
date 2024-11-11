@@ -46,3 +46,4 @@ for(sid in seed_ids){
 
 # Clean up temporary objects
 rm('cit', 'cit_count', 'cursor', 'fields_to_return', 'oal_domain', 'pgdat', 'pgraw', 'ppg', 'seed_ids', 'sid')
+gc()
