@@ -1,23 +1,28 @@
+# Load dependencies
+library(readr)
+
 # List TXT files in data directory
 fls <- list.files(path = data_dir,
                     pattern = '*.txt',
                     ignore.case = TRUE)
 
 # De-duplicate results
-# Set file count
+## Set file count
 fl <- 1
-## First file
-works <- read.delim(file = paste0(data_dir, fls[fl]),
-                  sep = '|')
+## Load and de-duplicate first file
+works <- read_delim(file = paste0(data_dir, fls[fl]),
+                  delim = '|',
+                  show_col_types = FALSE)
 works <- works[!duplicated(works), ]
-## Remaining files
+## Handle remaining files
 while(fl < length(fls)){
   # Increment file count
   fl <- fl + 1
-  ## Append and de-duplicate next file
+  # Append and de-duplicate next file
   works <- rbind(works,
-                 read.delim(file = paste0(data_dir, fls[fl]),
-                            sep = '|'))
+                 read_delim(file = paste0(data_dir, fls[fl]),
+                            delim = '|',
+                            show_col_types = FALSE))
   works <- works[!duplicated(works), ]
 }
 
