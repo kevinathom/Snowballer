@@ -2,9 +2,6 @@
 library(httr)
 library(jsonlite)
 
-# Get work entity ID(s)
-seed_ids <- c('W3125944002') # hard-coded example
-
 # Get works cited/citing
 oal_domain <- 'https://api.openalex.org/'
 fields_to_return <- c('id,doi,title,publication_year,language,type,is_retracted') # hard-coded example
