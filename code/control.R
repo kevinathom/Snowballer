@@ -26,6 +26,8 @@ fields_to_return <- c('id,doi,title,publication_year,language,type,is_retracted'
 source(paste0(code_dir, 'degrees_separation.R'))
 
 # Get works for each degree of separation
+## Initialize API domain
+oal_domain <- 'https://api.openalex.org/'
 ## Configure work entity IDs for first degree of separation
 seed_ids <- data.frame(cit = rep('seed'),
                        id = seed_ids)
@@ -34,7 +36,7 @@ for(deg in 1:length(cite_degrees)){
   source(paste0(code_dir, 'get_works.R'))
 }
 ## Clean up temporary objects
-rm('deg', 'my_email', 'seed_ids')
+rm('deg', 'fields_to_return', 'my_email', 'oal_domain', 'seed_ids')
 
 # De-duplicate results
 source(paste0(code_dir, 'dedup_works.R'))
