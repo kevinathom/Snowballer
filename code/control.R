@@ -1,3 +1,5 @@
+### Set initial information ###
+
 # Set user email
 my_email <- 'kevinat@wharton.upenn.edu'
 
@@ -17,14 +19,16 @@ seed_ids <- c('W3125944002', 'W2582743722') # hard-coded example
 # Set fields to request for works
 fields_to_return <- c('id,doi,title,publication_year,language,type,is_retracted')
 
-########################
-# Run Process
 
-## Encode degrees of separation
+### Run Process ###
+
+# Encode degrees of separation
 source(paste0(code_dir, 'degrees_separation.R'))
 
-## Get works
-source(paste0(code_dir, 'get_works.R'))
+# Get works for each degree of separation
+for(i in 1:length(cite_degrees)){
+  source(paste0(code_dir, 'get_works.R'))
+}
 
-## De-duplicate results
+# De-duplicate results
 source(paste0(code_dir, 'dedup_works.R'))
