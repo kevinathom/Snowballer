@@ -4,7 +4,6 @@ library(jsonlite)
 
 # Get works cited/citing
 oal_domain <- 'https://api.openalex.org/'
-fields_to_return <- c('id,doi,title,publication_year,language,type,is_retracted') # hard-coded example
 ## For each work entity ID
 for(sid in seed_ids){
   # Initialize results storage (to file)

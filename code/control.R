@@ -8,21 +8,23 @@ data_dir <- '~/Documents/GitHub/Snowballer/data/'
 code_dir <- '~/Documents/GitHub/Snowballer/code/'
 
 # Set degrees of separation
-## Cited by
-cited_by <- 3
-## Cites
-cites <- 1
+cited_by <- 1
+cites <- 2
 
 # Set seed work entity ID(s)
 seed_ids <- c('W3125944002', 'W2582743722') # hard-coded example
 
-########################
+# Set fields to request for works
+fields_to_return <- c('id,doi,title,publication_year,language,type,is_retracted')
 
-# Encode degrees of separation
+########################
+# Run Process
+
+## Encode degrees of separation
 source(paste0(code_dir, 'degrees_separation.R'))
 
-# Get works
+## Get works
 source(paste0(code_dir, 'get_works.R'))
 
-# De-duplicate results
+## De-duplicate results
 source(paste0(code_dir, 'dedup_works.R'))
