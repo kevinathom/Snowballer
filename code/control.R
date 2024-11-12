@@ -29,6 +29,8 @@ source(paste0(code_dir, 'degrees_separation.R'))
 for(i in 1:length(cite_degrees)){
   source(paste0(code_dir, 'get_works.R'))
 }
+## Clean up temporary objects
+rm('i', 'my_email')
 
 # De-duplicate results
 source(paste0(code_dir, 'dedup_works.R'))
