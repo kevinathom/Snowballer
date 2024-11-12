@@ -17,5 +17,5 @@ while(cited_by > 0 || cites > 0){
 }
 
 # Clean up temporary objects
-rm('cited_by', 'cited_by_i', 'cites', 'cites_i', 'deg')
+rm('cited_by', 'cited_by_deg', 'cites', 'cites_deg', 'deg')
 gc()
