@@ -1,21 +1,21 @@
 # Encode degrees of separation
 ## Initialize objects
 cite_degrees <- list()
-i <- 1
+deg <- 1
 ## Create vectors for get_works
 while(cited_by > 0 || cites > 0){
   # Check for 0 or more degrees
-  cited_by_i <- min(cited_by, 1)
-  cites_i <- min(cites, 1)
-  # Create the ith vector
-  cite_degrees[[i]] <- c(rep('cited_by', cited_by_i),
-                         rep('cites', cites_i))
+  cited_by_deg <- min(cited_by, 1)
+  cites_deg <- min(cites, 1)
+  # Create a vector for the current degree of separation
+  cite_degrees[[deg]] <- c(rep('cited_by', cited_by_deg),
+                         rep('cites', cites_deg))
   # Increment/Decrement counts
-  i <- i + 1
-  cited_by <- cited_by - cited_by_i
-  cites <- cites - cites_i
+  deg <- deg + 1
+  cited_by <- cited_by - cited_by_deg
+  cites <- cites - cites_deg
 }
 
 # Clean up temporary objects
-rm('cited_by', 'cited_by_i', 'cites', 'cites_i', 'i')
+rm('cited_by', 'cited_by_i', 'cites', 'cites_i', 'deg')
 gc()

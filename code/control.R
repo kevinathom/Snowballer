@@ -26,11 +26,11 @@ fields_to_return <- c('id,doi,title,publication_year,language,type,is_retracted'
 source(paste0(code_dir, 'degrees_separation.R'))
 
 # Get works for each degree of separation
-for(i in 1:length(cite_degrees)){
+for(deg in 1:length(cite_degrees)){
   source(paste0(code_dir, 'get_works.R'))
 }
 ## Clean up temporary objects
-rm('i', 'my_email')
+rm('deg', 'my_email')
 
 # De-duplicate results
 source(paste0(code_dir, 'dedup_works.R'))
