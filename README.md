@@ -4,7 +4,7 @@ Snowballer tool automates snowball literature searches
 ## Reference documentation
 - [OpenAlex works filters](https://docs.openalex.org/api-entities/works/filter-works)
 - [Paging](https://docs.openalex.org/how-to-use-the-api/get-lists-of-entities/paging)
-- [Search works](https://docs.openalex.org/api-entities/works/search-works)?
+- [Search works](https://docs.openalex.org/api-entities/works/search-works)
 
 ## Algorithm
 1. Get work entity ID(s)
