@@ -13,8 +13,8 @@ for(sid in seed_ids){
               file = paste0(data_dir, sid, '.txt'),
               sep = '|',
               row.names = FALSE)
-  # Get cited_by works then cites works
-  for(cit in c('cited_by', 'cites')){
+  # Get current degree of separation's works cited_by and/or cites
+  for(cit in cite_degrees[[i]]){
     # Get result count
     pgraw <- GET(paste0(oal_domain, 'works?mailto=', my_email, '&per-page=1&page=1&select=id&filter=', cit, ':', sid))
     pgdat <- fromJSON(rawToChar(pgraw$content))
