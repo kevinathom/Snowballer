@@ -11,7 +11,7 @@ code_dir <- '~/Documents/GitHub/Snowballer/code/'
 
 # Set degrees of separation
 cited_by <- 1
-cites <- 2
+cites <- 1
 
 # Set seed work entity ID(s)
 seed_ids <- c('W3125944002', 'W2762606399') # hard-coded example
@@ -36,7 +36,11 @@ for(deg in 1:length(cite_degrees)){
   source(paste0(code_dir, 'get_works.R'))
 }
 ## Clean up temporary objects
-rm('deg', 'fields_to_return', 'my_email', 'oal_domain', 'seed_ids')
+rm('cite_degrees', 'deg', 'fields_to_return', 'my_email', 'oal_domain', 'seed_ids')
 
 # De-duplicate results
 source(paste0(code_dir, 'dedup_works.R'))
+
+## Clean up temporary objects
+rm('code_dir', 'data_dir')
+gc()
