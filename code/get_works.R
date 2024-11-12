@@ -3,8 +3,6 @@ library(httr)
 library(jsonlite)
 
 # Initialize
-## Open Alex API address
-oal_domain <- 'https://api.openalex.org/'
 ## Work entity ID storage for next degree of separation
 next_ids <- data.frame(cit = c(),
                        id = c())
@@ -57,9 +55,9 @@ for(cit in cite_degrees[[deg]]){
 }
 
 # Prepare for next iteration
+next_ids$id <- gsub('https://openalex.org/*', '', next_ids$id)
 seed_ids <- next_ids
-## Clean IDs (of full path)
 
 # Clean up temporary objects
-rm('cit', 'cit_count', 'cursor', 'fields_to_return', 'next_ids', 'oal_domain', 'pgdat', 'pgraw', 'ppg', 'sid')
+rm('cit', 'cit_count', 'cursor', 'next_ids', 'pgdat', 'pgraw', 'ppg', 'sid')
 gc()
