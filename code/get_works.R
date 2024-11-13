@@ -14,6 +14,10 @@ dir.create(paste0(data_dir, 'working/'), showWarnings = FALSE)
 for(cit in cite_degrees[[deg]]){
   ## For each work entity ID
   for(sid in seed_ids$id[seed_ids$cit == 'seed' | seed_ids$cit == cit]){
+    # Skip if file exists
+    if(paste0(sid, '_', cit, '.txt') %in% list.files(path = paste0(data_dir, 'working/'), pattern = '*.txt', ignore.case = TRUE)){
+      next
+    }
     # Initialize results storage (to file)
     write.table(as.data.frame(matrix(nrow = 0,
                                      ncol = length(strsplit(fields_to_return, ",")[[1]]),
