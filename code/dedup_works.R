@@ -33,5 +33,6 @@ write.table(works,
             row.names = FALSE)
 
 # Clean up temporary objects
+unlink(paste0(data_dir, 'working/'), recursive = TRUE)
 rm('fl', 'fls', 'works')
 gc()
