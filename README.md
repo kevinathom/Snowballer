@@ -8,16 +8,18 @@ Snowballer tool automates snowball literature searches
 
 ## Algorithm
 1. Get work entity ID(s)
-   1. Hard-code in `control.py`?
-   1. Load from an external file?
-   1. Search?
-1. Determine the desired number of degrees of separation from seed articles
-   1. Create infrastructure for looping next top-level step at different degrees of separation
+   1. Current: Hard-code in `control.py`
+   1. Desired: Search using the [OpenAlex web interface](https://openalex.org/)
+	  1. Export results to CSV or save to CSV manually -- need to provide user instructions
+	  1. Load identifiers from CSV file
+1. Set the degrees of separation from seed articles to results
+	1. Input the maximum desired degrees for cites and cited_by (independently)
+	1. Encode for processing
 1. For each entity ID
-   1. Get works cited by the entity (`cited_by` filter)
+   1. Get works (cites or cited_by)
       1. Short query to get the number of works (see `meta` > `count` field)
       1. Loop to get all works
-   1. Get works that cite the entity (`cites` filter) -- repeat steps under parallel entry above
+   1. Repeat for cites and/or cited_by as specified by degrees of separation step
 1. Deduplicate works
    1. Load results
    1. Merge results
