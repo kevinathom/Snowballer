@@ -29,7 +29,8 @@ cited_by = 1
 cites = 1
 
 # Set seed work entity ID(s)
-seed_ids = ['W3125944002', 'W2762606399']  # hard-coded example
+seed_file = 'works.csv'
+#seed_ids = ['W3125944002', 'W2762606399']  # hard-coded example
 
 # Set fields to request for works
 fields_to_return = ['id', 'doi', 'title', 'publication_year', 'language', 'type', 'is_retracted']
@@ -40,6 +41,9 @@ Run Process
 
 # Encode degrees of separation
 exec(open(os.path.join(code_dir, 'degrees_separation.py')).read())
+
+# Read seed work IDs
+exec(open(os.path.join(code_dir, 'read_seeds.py')).read())
 
 # Get works for each degree of separation
 # Initialize API domain
