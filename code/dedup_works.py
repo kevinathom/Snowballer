@@ -23,7 +23,7 @@ if fls:
         works = pd.concat([works, next_df], ignore_index=True).drop_duplicates()
     
     # Save results (to consolidated file)
-    works.to_csv(os.path.join(data_dir, 'all_works.txt'), sep='|', index=False)
+    works.to_csv(os.path.join(data_dir, f'works_snowball_{time.strftime("%Y%m%d-%H%M%S")}.csv'), sep=',', index=False)
 
 # Clean up temporary objects
 for file in fls:
