@@ -8,7 +8,7 @@ Snowballer tool automates snowball literature searches
 
 ## Algorithm
 1. Get work entity ID(s)
-   1. Hard-code in `control.R`?
+   1. Hard-code in `control.py`?
    1. Load from an external file?
    1. Search?
 1. Determine the desired number of degrees of separation from seed articles
@@ -21,7 +21,7 @@ Snowballer tool automates snowball literature searches
 1. Deduplicate works
    1. Load results
    1. Merge results
-   1. Keep unique entries (where row `!duplicated()`)
+   1. Keep unique entries (where entire row is not duplicated)
 
 ## Sample calls
 - Seed article: `https://openalex.org/W3125944002`
