@@ -1,5 +1,4 @@
-# Snowballer
-Snowballer tool automates snowball literature searches
+# Snowballer algorithm and development
 
 ## Reference documentation
 - [OpenAlex works filters](https://docs.openalex.org/api-entities/works/filter-works)
@@ -8,10 +7,9 @@ Snowballer tool automates snowball literature searches
 
 ## Algorithm
 1. Get work entity ID(s)
-   1. Current: Hard-code in `control.py`
-   1. Desired: Search using the [OpenAlex web interface](https://openalex.org/)
-	  1. Export results to CSV or save to CSV manually -- need to provide user instructions
-	  1. Load identifiers from CSV file
+   1. Search using the [OpenAlex web interface](https://openalex.org/)
+   1. Export results to CSV or save to CSV manually -- need to provide user instructions
+   1. Load identifiers from CSV file
 1. Set the degrees of separation from seed articles to results
 	1. Input the maximum desired degrees for cites and cited_by (independently)
 	1. Encode for processing
