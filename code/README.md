@@ -4,6 +4,7 @@
 - [OpenAlex works filters](https://docs.openalex.org/api-entities/works/filter-works)
 - [Paging](https://docs.openalex.org/how-to-use-the-api/get-lists-of-entities/paging)
 - [Search works](https://docs.openalex.org/api-entities/works/search-works)
+- [Turning a Python script into a website](https://blog.pythonanywhere.com/169/)
 
 ## Algorithm
 1. Get work entity ID(s)
