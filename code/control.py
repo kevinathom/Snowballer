@@ -16,7 +16,7 @@ Set initial information
 """
 
 # Set user email
-my_email = 'kevinat@wharton.upenn.edu'
+my_email = 'user@domain.extension'
 
 # Set directories
 ## Data
@@ -30,7 +30,6 @@ cites = 1
 
 # Set seed work entity ID(s)
 seed_file = 'works.csv'
-#seed_ids = ['W3125944002', 'W2762606399']  # hard-coded example
 
 # Set fields to request for works
 fields_to_return = ['id', 'doi', 'title', 'publication_year', 'language', 'type', 'is_retracted']
