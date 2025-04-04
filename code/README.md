@@ -29,3 +29,9 @@
 - Title search: `https://api.openalex.org/works?filter=title.search:Does-the-stock-market-fully-value-intangibles`
 - Cited by: `https://api.openalex.org/works?filter=cited_by:W3125944002`
 - Cites: `https://api.openalex.org/works?filter=cites:W3125944002`
+
+## Aspirations
+- Clarify the free text prompts for degrees of separation
+- Add error-handling for text inputs
+- Test `user_variables.py` script
+- Make executable

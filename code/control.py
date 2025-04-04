@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Mar  5 11:06:24 2025
-@author: kevinatpenn
-Purpose: Set initial variables and orchestrate scripts
-    to perform a snowball literature search
+@author: kevinathom
+Purpose: Orchestrate scripts to perform a citation chase / snowball literature search
 """
 
 # Load dependencies
@@ -11,32 +10,8 @@ import os
 import pandas as pd
 import gc
 
-"""
-Set initial information
-"""
-
-# Set user email
-my_email = 'user@domain.extension'
-
-# Set directories
-## Data
-data_dir = os.path.join(os.path.expanduser('~'), 'Documents', 'GitHub', 'Snowballer', 'data')
-## Code
-code_dir = os.path.join(os.path.expanduser('~'), 'Documents', 'GitHub', 'Snowballer', 'code')
-
-# Set degrees of separation
-cited_by = 1
-cites = 1
-
-# Set seed work entity ID(s)
-seed_file = 'works.csv'
-
-# Set fields to request for works
-fields_to_return = ['id', 'doi', 'title', 'publication_year', 'language', 'type', 'is_retracted']
-
-"""
-Run Process
-"""
+# Collect initializing details from user
+exec(open(os.path.join(code_dir, 'degrees_separation.py')).read())
 
 # Encode degrees of separation
 exec(open(os.path.join(code_dir, 'degrees_separation.py')).read())
@@ -63,3 +38,6 @@ exec(open(os.path.join(code_dir, 'dedup_works.py')).read())
 # Clean up temporary objects
 del code_dir, data_dir
 gc.collect()
+
+# Show completion message
+show_completion_message(your_message = "The process is complete.")
