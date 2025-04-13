@@ -116,8 +116,8 @@ code_dir = open_directory_dialog(your_title = "Select the directory that holds y
 
 ## Set degrees of separation
 #Fix prompts for user free text
-cited_by = get_text_input(your_title="'Cited By' Degrees", your_message="Enter the degrees of separation for ___:", initial_value="1")
-cites = get_text_input(your_title="'Cites' Degrees", your_message="Enter the degrees of separation for ___:", initial_value="1")
+cited_by = get_text_input(your_title="'Cited By' Degrees", your_message="This tool will identify works cited by the work(s) you specify. How many degrees of separation do you want to retrieve? (e.g.: Enter 2 to find works cited by the work(s) you provide plus works sited by those works.)", initial_value="1")
+cites = get_text_input(your_title="'Cites' Degrees", your_message="This tool will identify works that cited the work(s) you specify. How many degrees of separation do you want to retrieve? (e.g.: Enter 2 to find works that cite the work(s) you provide plus works that site those works.)", initial_value="1")
 
 ## Set seed work entity ID(s)
 seed_file = open_file_dialog(your_title = "Select a CSV file containing the work entity ID(s) to use as a starting point.")
