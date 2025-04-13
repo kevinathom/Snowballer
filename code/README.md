@@ -5,6 +5,7 @@
 - [Paging](https://docs.openalex.org/how-to-use-the-api/get-lists-of-entities/paging)
 - [Search works](https://docs.openalex.org/api-entities/works/search-works)
 - [Turning a Python script into a website](https://blog.pythonanywhere.com/169/)
+- [Convert Python Script to .exe File](https://www.geeksforgeeks.org/convert-python-script-to-exe-file/)
 
 ## Algorithm
 1. Get work entity ID(s)
@@ -33,5 +34,5 @@
 ## Aspirations
 - Clarify the free text prompts for degrees of separation
 - Add error-handling for text inputs
-- Test `user_variables.py` script
+- Test `user_variables.py`
 - Make executable
