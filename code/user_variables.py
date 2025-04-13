@@ -10,10 +10,11 @@ import tkinter as tk
 from tkinter import simpledialog
 from tkinter import filedialog
 from tkinter import messagebox
+import re
 
 # Define functions
 ## Show text entry window
-def get_text_input(your_title="Input Dialog", your_message="Please enter your response:", initial_value=""):
+def get_email_input(your_title="Email Input", your_message="Please enter your email address:", initial_value="user@domain.com"):
     """
     Open a simple dialog box to get text input from the user.
     
@@ -32,6 +33,43 @@ def get_text_input(your_title="Input Dialog", your_message="Please enter your re
     user_input = simpledialog.askstring(
         title=your_title,
         prompt=your_message,
+        initialvalue=initial_value
+    )
+    # Clean up the tkinter instance
+    root.destroy()
+    
+    # Confirm email format
+    if user_input == "user@domain.com":
+        return None
+    elif re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', user_input) is None:
+        return None
+    else:
+        return user_input
+
+## Show integer entry window
+def get_integer_input(your_title="Integer Input", your_message="Please enter a number:", initial_value="1", min_value=0, max_value=None):
+    """
+    Open a dialog box to get an integer input from the user.
+    
+    Args:
+        your_title (str): The title of the dialog box
+        your_message (str): The message displayed to the user
+        initial_value (int, optional): Initial value in the field
+        min_value (int, optional): Minimum acceptable value
+        max_value (int, optional): Maximum acceptable value
+        
+    Returns:
+        str or None: The user's input, or None if canceled or invalid
+    """
+    # Initialize then hide tkinter
+    root = tk.Tk()
+    root.withdraw()
+    # Show the input dialog and get the user's response
+    user_input = simpledialog.askinteger(
+        title=your_title,
+        prompt=your_message,
+        minvalue=min_value,
+        maxvalue=max_value,
         initialvalue=initial_value
     )
     # Clean up the tkinter instance
@@ -108,16 +146,15 @@ def show_completion_message(your_title="Process Complete", your_message="The pro
 
 # Prompt user for variables
 ## Set user email
-my_email = get_text_input(your_title="Email", your_message="Enter your email address for the OpenAlex API:", initial_value="user@domain.com")
+my_email = get_email_input(your_title="Email", your_message="Enter your email address for the OpenAlex API:")
 
 ## Set directories
 data_dir = open_directory_dialog(your_title = "Select the directory that holds your data files.")
 code_dir = open_directory_dialog(your_title = "Select the directory that holds your copy of Snowballer's code files.")
 
 ## Set degrees of separation
-#Fix prompts for user free text
-cited_by = get_text_input(your_title="'Cited By' Degrees", your_message="This tool will identify works cited by the work(s) you specify. How many degrees of separation do you want to retrieve? (e.g.: Enter 2 to find works cited by the work(s) you provide plus works sited by those works.)", initial_value="1")
-cites = get_text_input(your_title="'Cites' Degrees", your_message="This tool will identify works that cited the work(s) you specify. How many degrees of separation do you want to retrieve? (e.g.: Enter 2 to find works that cite the work(s) you provide plus works that site those works.)", initial_value="1")
+cited_by = get_integer_input(your_title="'Cited By' Degrees", your_message="This tool will identify works cited by the work(s) you specify. How many degrees of separation do you want to retrieve? (e.g.: Enter 2 to find works cited by the work(s) you provide plus works sited by those works.)", initial_value="1")
+cites = get_integer_input(your_title="'Cites' Degrees", your_message="This tool will identify works that cited the work(s) you specify. How many degrees of separation do you want to retrieve? (e.g.: Enter 2 to find works that cite the work(s) you provide plus works that site those works.)", initial_value="1")
 
 ## Set seed work entity ID(s)
 seed_file = open_file_dialog(your_title = "Select a CSV file containing the work entity ID(s) to use as a starting point.")
