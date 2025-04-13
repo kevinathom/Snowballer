@@ -32,7 +32,5 @@
 - Cites: `https://api.openalex.org/works?filter=cites:W3125944002`
 
 ## Aspirations
-- Clarify the free text prompts for degrees of separation
-- Add error-handling for text inputs
-- Test `user_variables.py`
 - Make executable
+- Improve error-handling
