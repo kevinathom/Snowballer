@@ -24,7 +24,7 @@ def get_email_input(your_title="Email Input", your_message="Please enter your em
         initial_value (str): The initial value in the text field
         
     Returns:
-        str or None: The user's input, or None if canceled
+        str or None: The user's input, or None if canceled or invalid
     """
     # Initialize then hide tkinter
     root = tk.Tk()
