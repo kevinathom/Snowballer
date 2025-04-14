@@ -14,7 +14,7 @@ import gc
 code_dir = 'C:\\Users\\kevinat\\Documents\\GitHub\\Snowballer\\code'
 
 # Collect initializing details from user
-exec(open(os.path.join(code_dir, 'control.py')).read())
+exec(open(os.path.join(code_dir, 'user_variables.py')).read())
 
 # Encode degrees of separation
 exec(open(os.path.join(code_dir, 'degrees_separation.py')).read())
