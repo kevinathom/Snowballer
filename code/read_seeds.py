@@ -5,9 +5,6 @@ Created on Wed Mar  5 17:50:02 2025
 Purpose: Ingest seed work IDs
 """
 
-# Load dependencies
-import re
-
 # Read first column of seed_file
 seed_ids = pd.read_csv(os.path.join(data_dir, seed_file), sep=',', header=None, usecols=[0])
 
