@@ -146,22 +146,27 @@ def show_completion_message(your_title="Process Complete", your_message="The pro
 
 # Prompt user for variables
 ## Set user email
-my_email = get_email_input(your_title="Email", your_message="Enter your email address for the OpenAlex API:")
-
-## Set directories
-data_dir = open_directory_dialog(your_title = "Select the directory that holds your data files.")
-#code_dir = open_directory_dialog(your_title = "Select the directory that holds your copy of Snowballer's code files.")
-
-## Set degrees of separation
-cited_by = get_integer_input(your_title="'Cited By' Degrees", your_message="This tool will identify works cited by the work(s) you specify. How many degrees of separation do you want to retrieve? (e.g.: Enter 2 to find works cited by the work(s) you provide plus works sited by those works.)", initial_value="1")
-cites = get_integer_input(your_title="'Cites' Degrees", your_message="This tool will identify works that cited the work(s) you specify. How many degrees of separation do you want to retrieve? (e.g.: Enter 2 to find works that cite the work(s) you provide plus works that site those works.)", initial_value="1")
+my_email = get_email_input(your_title="Email", your_message="Enter your email address for the OpenAlex API.")
 
 ## Set seed work entity ID(s)
 seed_file = open_file_dialog(your_title = "Select a CSV file containing the work entity ID(s) to use as a starting point.")
 
+## Set degrees of separation
+cited_by = get_integer_input(your_title="'Cited By' Degrees", your_message="This tool will identify works cited by the work(s) you specify.\n" + \
+                            "How many degrees of separation do you want to retrieve?\n" + \
+                            "(e.g.: Enter 2 to find works cited by the work(s) you provide\n" + \
+                            "plus works cited by those works.)", initial_value="1")
+cites = get_integer_input(your_title="'Cites' Degrees", your_message="This tool will identify works that cite the work(s) you specify.\n" + \
+                            "How many degrees of separation do you want to retrieve?\n" + \
+                            "(e.g.: Enter 2 to find works that cite the work(s) you provide\n" + \
+                            "plus works that cite those works.)", initial_value="1")
+
+## Set directories
+data_dir = open_directory_dialog(your_title = "Select a directory to hold working and results files.")
+#code_dir = open_directory_dialog(your_title = "Select the directory that holds your copy of Snowballer's code files.")
+
 ## Set fields to request for works
 fields_to_return = ['id', 'doi', 'title', 'publication_year', 'language', 'type', 'is_retracted']
-
 
 # Clean up
 gc.collect()
