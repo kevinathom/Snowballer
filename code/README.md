@@ -7,6 +7,9 @@
 - [Turning a Python script into a website](https://blog.pythonanywhere.com/169/)
 - [Convert Python Script to .exe File](https://www.geeksforgeeks.org/convert-python-script-to-exe-file/)
 
+## Note
+I compile via this line in Git Bash: `python -m PyInstaller --onefile -w 'control.py' --hidden-import=tkinter --hidden-import=tkinter.simpledialog --hidden-import=tkinter.filedialog --hidden-import=tkinter.messagebox --hidden-import=requests`
+
 ## Algorithm
 1. Get work entity ID(s)
    1. Search using the [OpenAlex web interface](https://openalex.org/)
@@ -32,5 +35,7 @@
 - Cites: `https://api.openalex.org/works?filter=cites:W3125944002`
 
 ## Aspirations
-- Make executable
-- Improve error-handling
+- Add error-handling for invalid content in seed file
+- Add window to show the process is happening (in case it's long)
+- Add messaging for no results
+- Test for additional errors
