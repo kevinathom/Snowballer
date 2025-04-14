@@ -150,7 +150,7 @@ my_email = get_email_input(your_title="Email", your_message="Enter your email ad
 
 ## Set directories
 data_dir = open_directory_dialog(your_title = "Select the directory that holds your data files.")
-code_dir = open_directory_dialog(your_title = "Select the directory that holds your copy of Snowballer's code files.")
+#code_dir = open_directory_dialog(your_title = "Select the directory that holds your copy of Snowballer's code files.")
 
 ## Set degrees of separation
 cited_by = get_integer_input(your_title="'Cited By' Degrees", your_message="This tool will identify works cited by the work(s) you specify. How many degrees of separation do you want to retrieve? (e.g.: Enter 2 to find works cited by the work(s) you provide plus works sited by those works.)", initial_value="1")
