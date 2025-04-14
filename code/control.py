@@ -10,8 +10,11 @@ import os
 import pandas as pd
 import gc
 
+# Hard-code code directory
+code_dir = 'C:\\Users\\kevinat\\Documents\\GitHub\\Snowballer\\code'
+
 # Collect initializing details from user
-exec(open(os.path.join(code_dir, 'degrees_separation.py')).read())
+exec(open(os.path.join(code_dir, 'control.py')).read())
 
 # Encode degrees of separation
 exec(open(os.path.join(code_dir, 'degrees_separation.py')).read())
