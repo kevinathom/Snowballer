@@ -35,6 +35,7 @@ I compile via this line in Git Bash: `python -m PyInstaller --onefile -w 'contro
 - Cites: `https://api.openalex.org/works?filter=cites:W3125944002`
 
 ## Aspirations
+- Tag results with cites/cited_by and degree of separation
 - Add error-handling for invalid content in seed file
 - Add window to show the process is happening (in case it's long)
 - Add messaging for no results
