@@ -21,13 +21,13 @@ def resolve_path(relative_path):
     
   except Exception:
     # When developing, set and use the dev path
-    os.chdir('C:\\Users\\kevinat\\Documents\\GitHub\\Snowballer') # Repository directory
+    os.chdir('C:\\Users\\kevinat\\Documents\\GitHub\\Snowballer\\code') # Repository directory
     base_path = os.path.abspath(".")
     
   return os.path.join(base_path, relative_path)
 
 # Hard-code code directory
-code_dir = resolve_path('code')
+code_dir = resolve_path('')
 
 # Collect initializing details from user
 exec(open(os.path.join(code_dir, 'user_variables.py')).read())
