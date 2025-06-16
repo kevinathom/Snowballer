@@ -8,7 +8,7 @@
 - [Convert Python Script to .exe File](https://www.geeksforgeeks.org/convert-python-script-to-exe-file/)
 
 ## Note
-I compile via this line in a terminal: `python -m PyInstaller --onefile -w 'control.py' --hidden-import=tkinter --hidden-import=tkinter.simpledialog --hidden-import=tkinter.filedialog --hidden-import=tkinter.messagebox --hidden-import=requests --add-data "*.py;." --name=Snowballer`
+I compile via this line in a terminal: `python -m PyInstaller --onefile -w 'control.py' --hidden-import=tkinter --hidden-import=tkinter.simpledialog --hidden-import=tkinter.filedialog --hidden-import=tkinter.messagebox --hidden-import=requests --add-data "user_variables.py;." --add-data "degrees_separation.py;." --add-data "read_seeds.py;." --add-data "get_works.py;." --add-data "dedup_works.py;." --name=Snowballer`
 
 ## Algorithm
 1. Get work entity ID(s)
