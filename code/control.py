@@ -7,11 +7,27 @@ Purpose: Orchestrate scripts to perform a citation chase / snowball literature s
 
 # Load dependencies
 import os
+import sys
 import pandas as pd
 import gc
 
+# Create directory resolver function
+def resolve_path(relative_path):
+  """Get absolute path to resource, works for dev and for PyInstaller"""
+  
+  try:
+    # PyInstaller creates a temp folder and stores the path in _MEIPASS
+    base_path = sys._MEIPASS
+    
+  except Exception:
+    # When developing, set and use the dev path
+    os.chdir('C:\\Users\\kevinat\\Documents\\GitHub\\Snowballer') # Repository directory
+    base_path = os.path.abspath(".")
+    
+  return os.path.join(base_path, relative_path)
+
 # Hard-code code directory
-code_dir = 'C:\\Users\\kevinat\\Documents\\GitHub\\Snowballer\\code'
+code_dir = resolve_path('code')
 
 # Collect initializing details from user
 exec(open(os.path.join(code_dir, 'user_variables.py')).read())
