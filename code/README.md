@@ -35,8 +35,10 @@ I compile via this line in a terminal: `python -m PyInstaller --onefile -w 'cont
 - Cites: `https://api.openalex.org/works?filter=cites:W3125944002`
 
 ## Aspirations
-- Tag results with cites/cited_by and degree of separation
+- Tag results with direction of citation (cites/cited_by)
+- Tag results with degree of separation
+- Pull abstract for results
 - Add error-handling for invalid content in seed file
 - Add window to show the process is happening (in case it's long)
 - Add messaging for no results
-- Test for additional errors
+- Add integrated testing script
