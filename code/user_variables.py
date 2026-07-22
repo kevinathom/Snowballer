@@ -176,7 +176,7 @@ cites = get_integer_input(your_title="'Cites' Degrees", your_message="This tool 
                             "How many degrees of separation do you want to retrieve?\n" + \
                             "(e.g.: Enter 2 to find works that cite the work(s) you provide\n" + \
                             "plus works that cite those works.)", initial_value="1")
-if not ('cites' in locals() or 'citeds' in globals()):
+if not ('cites' in locals() or 'cites' in globals()):
     cites = 0
 if cites == None or cites == '':
     cites = 0
