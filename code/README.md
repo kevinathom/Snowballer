@@ -37,8 +37,10 @@ I compile via this line in a terminal: `python -m PyInstaller --onefile -w 'cont
 ## Aspirations
 - Tag results with direction of citation (cites/cited_by)
 - Tag results with degree of separation
-- Pull abstract for results
 - Add error-handling for invalid content in seed file
 - Add window to show the process is happening (in case it's long)
 - Add messaging for no results
 - Add integrated testing script
+
+## Limitations
+- OpenAlex does not offer abstracts. It can provide a table identified as *abstract_inverted_index* at the individual work level, but this cannot be exported as part of a list of works.
