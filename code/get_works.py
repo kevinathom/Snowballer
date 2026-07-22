@@ -24,6 +24,11 @@ Get works cited by and/or citing
 """
 # For each preference in cite_degrees
 for cit in cite_degrees[deg]:
+    if 'cited_by' in cit:
+        cited_by_degct += 1
+    if 'cites' in cit:
+        cites_degct += 1
+    
     # For each work entity ID
     for sid in seed_ids.loc[(seed_ids['cit'] == 'seed') | (seed_ids['cit'] == cit), 'id']:
         # Skip if file exists
@@ -32,7 +37,7 @@ for cit in cite_degrees[deg]:
             continue
         
         # Initialize results storage (to file)
-        pd.DataFrame(columns=fields_to_return).to_csv(file_path, sep='|', index=False)
+        pd.DataFrame(columns=fields_to_return+['direction','degrees']).to_csv(file_path, sep='|', index=False)
         
         # Get result count
         response = requests.get(f'{oal_domain}works?mailto={my_email}&per-page=1&page=1&select=id&filter={cit}:{sid}')
@@ -52,14 +57,19 @@ for cit in cite_degrees[deg]:
                 cursor = response_data['meta'].get('next_cursor')
                 
                 # Append latest page of results to the results file
-                if len(response_data['results']) > 0:
-                    pd.DataFrame(response_data['results']).to_csv(file_path, mode='a', sep='|', index=False, header=False)
-                    next_ids = pd.concat([next_ids, pd.DataFrame({'cit': [cit] * len(response_data['results']), 'id': [res['id'] for res in response_data['results']]})], ignore_index=True)
+                if 'cited_by' in cit:
+                    degct = cited_by_degct
+                elif 'cites' in cit:
+                    degct = cites_degct
+                res_count = len(response_data['results'])
+                if res_count > 0:
+                    pd.DataFrame(response_data['results']).assign(direction=[cit]*res_count, degrees=[degct]*res_count).to_csv(file_path, mode='a', sep='|', index=False, header=False)
+                    next_ids = pd.concat([next_ids, pd.DataFrame({'cit': [cit]*res_count, 'id': [res['id'] for res in response_data['results']]})], ignore_index=True)
 
 # Prepare for next iteration
 next_ids['id'] = next_ids['id'].str.replace('https://openalex.org/', '', regex=True)
 seed_df = next_ids
 
 # Clean up temporary objects
-del cit, cit_count, cursor, next_ids, response_data, response, ppg, sid
+del cit, cit_count, cursor, degct, next_ids, res_count, response_data, response, ppg, sid
 gc.collect()
