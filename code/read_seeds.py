@@ -11,5 +11,5 @@ seed_ids = pd.read_csv(os.path.join(data_dir, seed_file), sep=',', header=None, 
 # Clean work ID values
 seed_ids = seed_ids[0].tolist()
 seed_ids = [s.replace('https://openalex.org/', '') for s in seed_ids] # Remove web address
-seed_ids = [x for x in seed_ids if re.search(r'^[Ww]\d*', x)] # Filter for work ID format
+seed_ids = [x for x in seed_ids if re.search(r'^[Ww]\d+', x)] # Filter for work ID format
 seed_ids = list(set(seed_ids)) # Remove duplicates
