@@ -24,15 +24,22 @@ Get works cited by and/or citing
 """
 # For each preference in cite_degrees
 for cit in cite_degrees[deg]:
+    
+    # Clean cit value
+    if not isinstance(cit, str):
+        cit = cit[0]
+  
+    # Increment counter
     if 'cited_by' in cit:
         cited_by_degct += 1
-    if 'cites' in cit:
+    elif 'cites' in cit:
         cites_degct += 1
     
     # For each work entity ID
     for sid in seed_ids.loc[(seed_ids['cit'] == 'seed') | (seed_ids['cit'] == cit), 'id']:
+        
         # Skip if file exists
-        file_path = os.path.join(data_dir, 'working', f'{sid}_{cit}.txt')
+        file_path = os.path.normpath(os.path.join(data_dir, 'working', f'{sid}_{cit}.txt'))
         while os.path.exists(file_path):
             continue
         
