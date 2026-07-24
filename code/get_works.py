@@ -29,12 +29,6 @@ for cit in cite_degrees[deg]:
     if not isinstance(cit, str):
         cit = cit[0]
     
-    # Increment counter
-    if 'cited_by' in cit:
-        cited_by_degct += 1
-    elif 'cites' in cit:
-        cites_degct += 1
-    
     # For each work entity ID
     for sid in seed_ids.loc[(seed_ids['cit'] == 'seed') | (seed_ids['cit'] == cit), 'id']:
         
