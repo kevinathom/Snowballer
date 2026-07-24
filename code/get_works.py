@@ -28,7 +28,7 @@ for cit in cite_degrees[deg]:
     # Clean cit value
     if not isinstance(cit, str):
         cit = cit[0]
-  
+    
     # Increment counter
     if 'cited_by' in cit:
         cited_by_degct += 1
@@ -75,7 +75,7 @@ for cit in cite_degrees[deg]:
 
 # Prepare for next iteration
 next_ids['id'] = next_ids['id'].str.replace('https://openalex.org/', '', regex=True)
-seed_df = next_ids
+seed_ids = next_ids
 
 # Clean up temporary objects
 del cit, cit_count, cursor, degct, next_ids, res_count, response_data, response, ppg, sid
