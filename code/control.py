@@ -48,6 +48,12 @@ seed_ids = pd.DataFrame({'cit': ['seed'] * len(seed_ids), 'id': seed_ids})
 cited_by_degct = 0
 cites_degct = 0
 for deg in range(len(cite_degrees)):
+    # Increment counter
+    if 'cited_by' in cite_degrees[deg]:
+        cited_by_degct += 1
+    if 'cites' in cite_degrees[deg]:
+        cites_degct += 1
+    # Get works
     exec(open(os.path.join(code_dir, 'get_works.py')).read())
 
 # Clean up temporary objects
