@@ -57,7 +57,7 @@ for cit in cite_degrees[deg]:
             ppg = 200  # Results per page
             
             # While there are results remaining
-            while cursor:
+            while not cursor is None:
                 time.sleep(0.1)  # Obey public API rate limit of max 10 requests per second
                 response = requests.get(f'{oal_domain}works?mailto={my_email}&per-page={ppg}&cursor={cursor}&select={",".join(fields_to_return)}&filter={cit}:{sid}')
                 response_data = response.json()
