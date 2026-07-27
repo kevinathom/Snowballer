@@ -43,6 +43,10 @@ for cit in cite_degrees[deg]:
         # Get result count
         response = requests.get(f'{oal_domain}works?mailto={my_email}&per-page=1&page=1&select=id&filter={cit}:{sid}')
         response_data = response.json()
+        if 'error' in response_data:
+            show_completion_message(your_message = response_data['error'])
+            sys.exit()
+            root.destroy()
         cit_count = response_data['meta']['count']
         
         # If there are citations
@@ -55,6 +59,10 @@ for cit in cite_degrees[deg]:
                 time.sleep(0.1)  # Obey public API rate limit of max 10 requests per second
                 response = requests.get(f'{oal_domain}works?mailto={my_email}&per-page={ppg}&cursor={cursor}&select={",".join(fields_to_return)}&filter={cit}:{sid}')
                 response_data = response.json()
+                if 'error' in response_data:
+                    show_completion_message(your_message = response_data['error'])
+                    sys.exit()
+                    root.destroy()
                 cursor = response_data['meta'].get('next_cursor')
                 
                 # Append latest page of results to the results file
