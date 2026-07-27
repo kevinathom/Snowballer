@@ -9,6 +9,31 @@ Purpose: Retrieve works at a given degree of separation
 import time
 import requests
 
+# Define functions
+## Show text entry window
+def get_wait_permission(your_title="Process Paused", your_message="Do you want to wait?"):
+    """
+    Open a dialog window prompting asking the user whether to wait.
+
+    Args:
+        your_title (str): The title of the dialog box
+        your_message (str): The yes/no question displayed to the user
+
+    Returns:
+        bool: True if the user clicks Yes (wait), False if the user clicks No (end process)
+    """
+    # Initialize then hide tkinter
+    root = tk.Tk()
+    root.withdraw()
+    # Show the yes/no dialog and get the user's response
+    result = messagebox.askyesno(
+        title=your_title,
+        message=your_message
+    )
+    # Clean up the tkinter instance
+    root.destroy()
+    return result  # True = Yes (wait), False = No (end process)
+
 """
 Set initial information
 """
@@ -44,9 +69,13 @@ for cit in cite_degrees[deg]:
         response = requests.get(f'{oal_domain}works?mailto={my_email}&per-page=1&page=1&select=id&filter={cit}:{sid}')
         response_data = response.json()
         if 'error' in response_data:
-            show_completion_message(your_message = response_data['error'])
-            sys.exit()
-            root.destroy()
+            if get_wait_permission(your_title=response_data['error'], your_message="Do you want to wait and resume in 24 hours?\n" + \
+                                    "Select Yes and keep this process running to resume when you have more API credits.\n" + \
+                                    "Select No to end this process and keep any data you've collected so far."):
+                time.sleep(86401)  # Wait 24 hours for the free API credits to refresh + 1 second for safety
+            else:
+                show_completion_message(your_title="Process Cancelled", your_message=response_data['error'])
+                sys.exit(3) # Terminate with code 3, API error
         cit_count = response_data['meta']['count']
         
         # If there are citations
