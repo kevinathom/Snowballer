@@ -69,7 +69,7 @@ for cit in cite_degrees[deg]:
         # Get result count
         response = requests.get(f'{oal_domain}works?mailto={my_email}&per-page=1&page=1&select=id&filter={cit}:{sid}')
         response_data = response.json()
-        if 'error' in response_data:
+        while 'error' in response_data:
             if get_wait_permission(your_title=response_data['error'], your_message="Do you want to wait until your API credits refresh?\n" + \
                                     "Select Yes and keep this process running to resume after midnight UTC.\n" + \
                                     "Select No to end this process and keep any data you've collected so far."):
@@ -92,7 +92,7 @@ for cit in cite_degrees[deg]:
                 time.sleep(0.1)  # Obey public API rate limit of max 10 requests per second
                 response = requests.get(f'{oal_domain}works?mailto={my_email}&per-page={ppg}&cursor={cursor}&select={",".join(fields_to_return)}&filter={cit}:{sid}')
                 response_data = response.json()
-                if 'error' in response_data:
+                while 'error' in response_data:
                     if get_wait_permission(your_title=response_data['error'], your_message="Do you want to wait until your API credits refresh?\n" + \
                                             "Select Yes and keep this process running to resume after midnight UTC.\n" + \
                                             "Select No to end this process and keep any data you've collected so far."):
