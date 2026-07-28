@@ -148,15 +148,19 @@ Get works cited by and/or citing
 # For each preference in cite_degrees
 for cit in cite_degrees[deg]:
     
-    # Clean cit value
+    # Clean and count cit value
     if not isinstance(cit, str):
         cit = cit[0]
+    if 'cited_by' in cit:
+        degct = cited_by_degct
+    elif 'cites' in cit:
+        degct = cites_degct
     
     # For each work entity ID
     for sid in seed_ids.loc[(seed_ids['cit'] == 'seed') | (seed_ids['cit'] == cit), 'id']:
         
         # Skip if file exists
-        file_path = os.path.normpath(os.path.join(data_dir, 'working', f'{sid}_{cit}.txt'))
+        file_path = os.path.normpath(os.path.join(data_dir, 'working', f'{sid}_{cit}_{degct}.txt'))
         if os.path.exists(file_path):
             continue
         
@@ -205,10 +209,6 @@ for cit in cite_degrees[deg]:
                 cursor = response_data['meta'].get('next_cursor')
                 
                 # Append latest page of results to the results file
-                if 'cited_by' in cit:
-                    degct = cited_by_degct
-                elif 'cites' in cit:
-                    degct = cites_degct
                 res_count = len(response_data['results'])
                 if res_count > 0:
                     pd.DataFrame(response_data['results']).assign(direction=[cit]*res_count, degrees=[degct]*res_count).to_csv(file_path, mode='a', sep='|', index=False, header=False)
