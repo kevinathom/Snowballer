@@ -7,6 +7,7 @@ Purpose: Retrieve works at a given degree of separation
 
 # Load dependencies
 import time
+from datetime import datetime, timezone, timedelta
 import requests
 
 # Define functions
@@ -69,10 +70,11 @@ for cit in cite_degrees[deg]:
         response = requests.get(f'{oal_domain}works?mailto={my_email}&per-page=1&page=1&select=id&filter={cit}:{sid}')
         response_data = response.json()
         if 'error' in response_data:
-            if get_wait_permission(your_title=response_data['error'], your_message="Do you want to wait and resume in 24 hours?\n" + \
-                                    "Select Yes and keep this process running to resume when you have more API credits.\n" + \
+            if get_wait_permission(your_title=response_data['error'], your_message="Do you want to wait until your API credits refresh?\n" + \
+                                    "Select Yes and keep this process running to resume after midnight UTC.\n" + \
                                     "Select No to end this process and keep any data you've collected so far."):
-                time.sleep(86401)  # Wait 24 hours for the free API credits to refresh + 1 second for safety
+                # Wait until 1 second after midnight, UTC
+                time.sleep(((datetime.now(timezone.utc) + timedelta(days=1)).replace(hour=0, minute=0, second=1, microsecond=0) - datetime.now(timezone.utc)).total_seconds())
             else:
                 show_completion_message(your_title="Process Cancelled", your_message=response_data['error'])
                 sys.exit(3) # Terminate with code 3, API error
