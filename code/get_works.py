@@ -166,14 +166,16 @@ for cit in cite_degrees[deg]:
         # Get result count
         response_data = requests.get(f'{oal_domain}works?mailto={my_email}&per-page=1&page=1&select=id&filter={cit}:{sid}').json()
         while 'error' in response_data:
-            if get_wait_permission(your_title=response_data['error'], your_message="Do you want to wait until your API credits refresh?\n" + \
-                                    "Select Yes and keep this process running to resume after midnight UTC.\n" + \
-                                    "Select No to end this process and keep any data you've collected so far."):
+            wait_permission = get_wait_permission(your_title=response_data['error'], your_message="Do you want to wait until your API credits refresh?\n" + \
+                                                  "Select Yes and keep this process running to resume after midnight UTC.\n" + \
+                                                  "Select No to end this process and keep any data you've collected so far.")
+            if wait_permission:
                 # Wait until 1 second after midnight, UTC
                 time_until_reset = ((datetime.now(timezone.utc) + timedelta(days=1)).replace(hour=0, minute=0, second=1, microsecond=0) - datetime.now(timezone.utc)).total_seconds()
                 show_countdown_timer(your_title="Waiting", seconds=time_until_reset)
                 response_data = requests.get(f'{oal_domain}works?mailto={my_email}&per-page=1&page=1&select=id&filter={cit}:{sid}').json()
             else:
+                # Cancel the process
                 show_completion_message(your_title="Process Cancelled", your_message=response_data['error'])
                 sys.exit(3) # Terminate with code 3, API error
         cit_count = response_data['meta']['count']
@@ -188,14 +190,16 @@ for cit in cite_degrees[deg]:
                 time.sleep(0.1)  # Obey public API rate limit of max 10 requests per second
                 response_data = requests.get(f'{oal_domain}works?mailto={my_email}&per-page={ppg}&cursor={cursor}&select={",".join(fields_to_return)}&filter={cit}:{sid}').json()
                 while 'error' in response_data:
-                    if get_wait_permission(your_title=response_data['error'], your_message="Do you want to wait until your API credits refresh?\n" + \
-                                            "Select Yes and keep this process running to resume after midnight UTC.\n" + \
-                                            "Select No to end this process and keep any data you've collected so far."):
+                    wait_permission = get_wait_permission(your_title=response_data['error'], your_message="Do you want to wait until your API credits refresh?\n" + \
+                                                          "Select Yes and keep this process running to resume after midnight UTC.\n" + \
+                                                          "Select No to end this process and keep any data you've collected so far.")
+                    if wait_permission:
                         # Wait until 1 second after midnight, UTC
                         time_until_reset = ((datetime.now(timezone.utc) + timedelta(days=1)).replace(hour=0, minute=0, second=1, microsecond=0) - datetime.now(timezone.utc)).total_seconds()
                         show_countdown_timer(your_title="Waiting", seconds=time_until_reset)
                         response_data = requests.get(f'{oal_domain}works?mailto={my_email}&per-page=1&page=1&select=id&filter={cit}:{sid}').json()
                     else:
+                        # Cancel the process
                         show_completion_message(your_title="Process Cancelled", your_message=response_data['error'])
                         sys.exit(3) # Terminate with code 3, API error
                 cursor = response_data['meta'].get('next_cursor')
