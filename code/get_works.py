@@ -91,9 +91,14 @@ for cit in cite_degrees[deg]:
                 response = requests.get(f'{oal_domain}works?mailto={my_email}&per-page={ppg}&cursor={cursor}&select={",".join(fields_to_return)}&filter={cit}:{sid}')
                 response_data = response.json()
                 if 'error' in response_data:
-                    show_completion_message(your_message = response_data['error'])
-                    sys.exit()
-                    root.destroy()
+                    if get_wait_permission(your_title=response_data['error'], your_message="Do you want to wait until your API credits refresh?\n" + \
+                                            "Select Yes and keep this process running to resume after midnight UTC.\n" + \
+                                            "Select No to end this process and keep any data you've collected so far."):
+                        # Wait until 1 second after midnight, UTC
+                        time.sleep(((datetime.now(timezone.utc) + timedelta(days=1)).replace(hour=0, minute=0, second=1, microsecond=0) - datetime.now(timezone.utc)).total_seconds())
+                    else:
+                        show_completion_message(your_title="Process Cancelled", your_message=response_data['error'])
+                        sys.exit(3) # Terminate with code 3, API error
                 cursor = response_data['meta'].get('next_cursor')
                 
                 # Append latest page of results to the results file
