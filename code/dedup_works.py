@@ -5,6 +5,9 @@ Created on Wed Mar  5 11:19:43 2025
 Purpose: Remove duplicate works and consolidate files
 """
 
+# Load dependencies
+import time
+
 # List TXT files in data directory
 working_dir = os.path.join(data_dir, 'working')
 fls = [f for f in os.listdir(working_dir) if f.lower().endswith('.txt')]

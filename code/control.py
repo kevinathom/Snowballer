@@ -57,7 +57,9 @@ for deg in range(len(cite_degrees)):
     exec(open(os.path.join(code_dir, 'get_works.py')).read())
 
 # Clean up temporary objects
-del cite_degrees, cited_by_degct, cites_degct, deg, fields_to_return, my_email, oal_domain, seed_ids
+for var in [cite_degrees, cited_by_degct, cites_degct, deg, fields_to_return, my_email, oal_domain, seed_ids]:
+  if var in dir():
+    del var
 
 # De-duplicate results
 exec(open(os.path.join(code_dir, 'dedup_works.py')).read())

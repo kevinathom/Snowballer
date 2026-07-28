@@ -157,7 +157,7 @@ for cit in cite_degrees[deg]:
         
         # Skip if file exists
         file_path = os.path.normpath(os.path.join(data_dir, 'working', f'{sid}_{cit}.txt'))
-        while os.path.exists(file_path):
+        if os.path.exists(file_path):
             continue
         
         # Initialize results storage (to file)
@@ -186,7 +186,7 @@ for cit in cite_degrees[deg]:
             ppg = 200  # Results per page
             
             # While there are results remaining
-            while not cursor is None:
+            while cursor is not None:
                 time.sleep(0.1)  # Obey public API rate limit of max 10 requests per second
                 response_data = requests.get(f'{oal_domain}works?mailto={my_email}&per-page={ppg}&cursor={cursor}&select={",".join(fields_to_return)}&filter={cit}:{sid}').json()
                 while 'error' in response_data:
@@ -197,7 +197,7 @@ for cit in cite_degrees[deg]:
                         # Wait until 1 second after midnight, UTC
                         time_until_reset = ((datetime.now(timezone.utc) + timedelta(days=1)).replace(hour=0, minute=0, second=1, microsecond=0) - datetime.now(timezone.utc)).total_seconds()
                         show_countdown_timer(your_title="Waiting", seconds=time_until_reset)
-                        response_data = requests.get(f'{oal_domain}works?mailto={my_email}&per-page=1&page=1&select=id&filter={cit}:{sid}').json()
+                        response_data = requests.get(f'{oal_domain}works?mailto={my_email}&per-page={ppg}&cursor={cursor}&select={",".join(fields_to_return)}&filter={cit}:{sid}').json()
                     else:
                         # Cancel the process
                         show_completion_message(your_title="Process Cancelled", your_message=response_data['error'])
@@ -219,5 +219,7 @@ next_ids['id'] = next_ids['id'].str.replace('https://openalex.org/', '', regex=T
 seed_ids = next_ids
 
 # Clean up temporary objects
-del cit, cit_count, cursor, degct, next_ids, res_count, response_data, response, ppg, sid, time_until_reset
+for var in [cit, cit_count, cursor, degct, next_ids, res_count, response_data, ppg, sid, time_until_reset]:
+  if var in dir():
+    del var
 gc.collect()
