@@ -35,6 +35,103 @@ def get_wait_permission(your_title="Process Paused", your_message="Do you want t
     root.destroy()
     return result  # True = Yes (wait), False = No (end process)
 
+def show_countdown_timer(your_title="Countdown Timer", your_message="Resuming in:", hours=0, minutes=0, seconds=0):
+    """
+    Open a dialog window displaying a countdown timer in hours, minutes, and seconds.
+    Closes automatically when the countdown reaches zero.
+
+    Args:
+        your_title (str): The title of the dialog box
+        your_message (str): The message displayed above the countdown
+        hours (int): Hours to count down from
+        minutes (int): Minutes to count down from
+        seconds (int): Seconds to count down from
+
+    Returns:
+        bool: True if the timer completed naturally, False if the user cancelled
+    """
+    # Initialize then hide tkinter root
+    root = tk.Tk()
+    root.withdraw()
+
+    # Convert input to total seconds
+    total = int(hours * 3600 + minutes * 60 + seconds)
+
+    # Use mutable containers to track state across inner functions
+    remaining = [total]
+    result = [True]  # True = completed naturally, False = cancelled
+
+    # Create the dialog window
+    dialog = tk.Toplevel(root)
+    dialog.title(your_title)
+    dialog.resizable(False, False)
+    dialog.wait_visibility()
+    dialog.grab_set()  # Make modal
+
+    # Add the prompt message
+    tk.Label(
+        dialog,
+        text=your_message,
+        wraplength=320,
+        justify="center"
+    ).pack(padx=20, pady=(20, 5))
+
+    # Add the countdown display label
+    time_label = tk.Label(
+        dialog,
+        text="",
+        font=("Courier", 36, "bold")  # Monospaced so digits don't shift as they change
+    )
+    time_label.pack(padx=20, pady=(5, 20))
+
+    # Add a Cancel button
+    button_frame = tk.Frame(dialog, pady=10)
+    button_frame.pack()
+
+    def on_cancel():
+        result[0] = False
+        dialog.destroy()
+
+    tk.Button(button_frame, text="Cancel", width=10, command=on_cancel).pack()
+
+    # Handle the X button — treated as cancel
+    dialog.protocol("WM_DELETE_WINDOW", on_cancel)
+
+    # Format seconds into HH:MM:SS
+    def format_time(secs):
+        h = secs // 3600
+        m = (secs % 3600) // 60
+        s = secs % 60
+        return f"{h:02d}:{m:02d}:{s:02d}"
+
+    # Tick function — updates the label and reschedules itself every 1 second
+    def tick():
+        time_label.config(text=format_time(remaining[0]))
+        if remaining[0] > 0:
+            remaining[0] -= 1
+            dialog.after(1000, tick)
+        else:
+            # Briefly show 00:00:00 before closing so it doesn't feel abrupt
+            dialog.after(500, dialog.destroy)
+
+    # Center the dialog on the screen
+    dialog.update_idletasks()
+    win_width  = dialog.winfo_width()
+    win_height = dialog.winfo_height()
+    scr_x = (dialog.winfo_screenwidth()  // 2) - (win_width  // 2)
+    scr_y = (dialog.winfo_screenheight() // 2) - (win_height // 2)
+    dialog.geometry(f"+{scr_x}+{scr_y}")
+
+    # Start the countdown
+    tick()
+
+    # Block here until the dialog closes
+    root.wait_window(dialog)
+
+    # Clean up the tkinter instance
+    root.destroy()
+    return result[0]
+
 """
 Set initial information
 """
@@ -74,7 +171,8 @@ for cit in cite_degrees[deg]:
                                     "Select Yes and keep this process running to resume after midnight UTC.\n" + \
                                     "Select No to end this process and keep any data you've collected so far."):
                 # Wait until 1 second after midnight, UTC
-                time.sleep(((datetime.now(timezone.utc) + timedelta(days=1)).replace(hour=0, minute=0, second=1, microsecond=0) - datetime.now(timezone.utc)).total_seconds())
+                time_until_reset = ((datetime.now(timezone.utc) + timedelta(days=1)).replace(hour=0, minute=0, second=1, microsecond=0) - datetime.now(timezone.utc)).total_seconds()
+                show_countdown_timer(your_title="Waiting", seconds=time_until_reset)
                 response = requests.get(f'{oal_domain}works?mailto={my_email}&per-page=1&page=1&select=id&filter={cit}:{sid}')
                 response_data = response.json()
             else:
@@ -97,8 +195,9 @@ for cit in cite_degrees[deg]:
                                             "Select Yes and keep this process running to resume after midnight UTC.\n" + \
                                             "Select No to end this process and keep any data you've collected so far."):
                         # Wait until 1 second after midnight, UTC
-                        time.sleep(((datetime.now(timezone.utc) + timedelta(days=1)).replace(hour=0, minute=0, second=1, microsecond=0) - datetime.now(timezone.utc)).total_seconds())
-                        response = requests.get(f'{oal_domain}works?mailto={my_email}&per-page={ppg}&cursor={cursor}&select={",".join(fields_to_return)}&filter={cit}:{sid}')
+                        time_until_reset = ((datetime.now(timezone.utc) + timedelta(days=1)).replace(hour=0, minute=0, second=1, microsecond=0) - datetime.now(timezone.utc)).total_seconds()
+                        show_countdown_timer(your_title="Waiting", seconds=time_until_reset)
+                        response = requests.get(f'{oal_domain}works?mailto={my_email}&per-page=1&page=1&select=id&filter={cit}:{sid}')
                         response_data = response.json()
                     else:
                         show_completion_message(your_title="Process Cancelled", your_message=response_data['error'])
@@ -120,5 +219,5 @@ next_ids['id'] = next_ids['id'].str.replace('https://openalex.org/', '', regex=T
 seed_ids = next_ids
 
 # Clean up temporary objects
-del cit, cit_count, cursor, degct, next_ids, res_count, response_data, response, ppg, sid
+del cit, cit_count, cursor, degct, next_ids, res_count, response_data, response, ppg, sid, time_until_reset
 gc.collect()
