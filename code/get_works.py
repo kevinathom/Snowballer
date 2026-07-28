@@ -75,6 +75,8 @@ for cit in cite_degrees[deg]:
                                     "Select No to end this process and keep any data you've collected so far."):
                 # Wait until 1 second after midnight, UTC
                 time.sleep(((datetime.now(timezone.utc) + timedelta(days=1)).replace(hour=0, minute=0, second=1, microsecond=0) - datetime.now(timezone.utc)).total_seconds())
+                response = requests.get(f'{oal_domain}works?mailto={my_email}&per-page=1&page=1&select=id&filter={cit}:{sid}')
+                response_data = response.json()
             else:
                 show_completion_message(your_title="Process Cancelled", your_message=response_data['error'])
                 sys.exit(3) # Terminate with code 3, API error
@@ -96,6 +98,8 @@ for cit in cite_degrees[deg]:
                                             "Select No to end this process and keep any data you've collected so far."):
                         # Wait until 1 second after midnight, UTC
                         time.sleep(((datetime.now(timezone.utc) + timedelta(days=1)).replace(hour=0, minute=0, second=1, microsecond=0) - datetime.now(timezone.utc)).total_seconds())
+                        response = requests.get(f'{oal_domain}works?mailto={my_email}&per-page={ppg}&cursor={cursor}&select={",".join(fields_to_return)}&filter={cit}:{sid}')
+                        response_data = response.json()
                     else:
                         show_completion_message(your_title="Process Cancelled", your_message=response_data['error'])
                         sys.exit(3) # Terminate with code 3, API error
