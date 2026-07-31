@@ -6,11 +6,16 @@ Purpose: Remove duplicate works and consolidate files
 """
 
 # Load dependencies
+import re
 import time
 
 # List TXT files in data directory
 working_dir = os.path.join(data_dir, 'working')
 fls = [f for f in os.listdir(working_dir) if f.lower().endswith('.txt')]
+
+# List unique direction-degree values
+dirdegs = set([re.findall(r'W\d+_(cite[a-z_]+_\d+)\.txt', f) for f in fls])
+#flatten this list!!!!!!
 
 # De-duplicate results
 if fls:
@@ -33,5 +38,5 @@ for file in fls:
     os.remove(os.path.join(working_dir, file))
 os.rmdir(working_dir)
 
-del fl, fls, works
+#del fl, fls, works
 gc.collect()
