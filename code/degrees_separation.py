@@ -23,5 +23,5 @@ while cited_by > 0 or cites > 0:
     cites -= cites_deg
 
 # Clean up temporary objects
-del cited_by, cited_by_deg, cites, cites_deg, deg
+#del cited_by, cited_by_deg, cites, cites_deg, deg
 gc.collect()
