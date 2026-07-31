@@ -133,6 +133,23 @@ def show_countdown_timer(your_title="Countdown Timer", your_message="Resuming in
     return result[0]
 
 """
+Temporary: Logger for troubleshooting
+"""
+import logging
+import os
+
+# Only configure the logger once (since get_works.py is exec()'d in a loop)
+if not logging.getLogger('snowballer').handlers:
+    log_path = os.path.join(data_dir, 'snowballer_debug.log')
+    handler = logging.FileHandler(log_path, encoding='utf-8')
+    handler.setFormatter(logging.Formatter('%(asctime)s | %(levelname)s | %(message)s'))
+    logger = logging.getLogger('snowballer')
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(handler)
+else:
+    logger = logging.getLogger('snowballer')
+
+"""
 Set initial information
 """
 
@@ -159,9 +176,13 @@ for cit in cite_degrees[deg]:
     # For each work entity ID
     for sid in seed_ids.loc[(seed_ids['cit'] == 'seed') | (seed_ids['cit'] == cit), 'id']:
         
+        # Temporary: for logger
+        logger.info(f"Processing | direction={cit} | degree={deg} | seed_id={sid}")
+        
         # Skip if file exists
         file_path = os.path.normpath(os.path.join(data_dir, 'working', f'{sid}_{cit}_{degct}.txt'))
         if os.path.exists(file_path):
+            logger.warning(f"SKIPPED (file exists) | sid={sid} | path={file_path}")
             continue
         
         # Initialize results storage (to file)
@@ -169,13 +190,15 @@ for cit in cite_degrees[deg]:
         
         # Get result count
         response_data = requests.get(f'{oal_domain}works?mailto={my_email}&per-page=1&page=1&select=id&filter={cit}:{sid}').json()
+        #wait_permission = None
+        #time_until_reset = None
         while 'error' in response_data:
             wait_permission = get_wait_permission(your_title=response_data['error'], your_message="Do you want to wait until your API credits refresh?\n" + \
                                                   "Select Yes and keep this process running to resume after midnight UTC.\n" + \
                                                   "Select No to end this process and keep any data you've collected so far.")
             if wait_permission:
-                # Wait until 1 second after midnight, UTC
-                time_until_reset = ((datetime.now(timezone.utc) + timedelta(days=1)).replace(hour=0, minute=0, second=1, microsecond=0) - datetime.now(timezone.utc)).total_seconds()
+                # Wait until 1 minute after midnight, UTC
+                time_until_reset = ((datetime.now(timezone.utc) + timedelta(days=1)).replace(hour=0, minute=1, second=0, microsecond=0) - datetime.now(timezone.utc)).total_seconds()
                 show_countdown_timer(your_title="Waiting", seconds=time_until_reset)
                 response_data = requests.get(f'{oal_domain}works?mailto={my_email}&per-page=1&page=1&select=id&filter={cit}:{sid}').json()
             else:
@@ -183,43 +206,74 @@ for cit in cite_degrees[deg]:
                 show_completion_message(your_title="Process Cancelled", your_message=response_data['error'])
                 sys.exit(3) # Terminate with code 3, API error
         cit_count = response_data['meta']['count']
+        logger.info(f"Result count | sid={sid} | direction={cit} | count={cit_count}")
         
         # If there are citations
         if cit_count > 0:
             cursor = '*'  # Starts pagination
             ppg = 200  # Results per page
+            # For logger
+            page_num = 0
+            total_fetched = 0
             
             # While there are results remaining
             while cursor is not None:
                 time.sleep(0.1)  # Obey public API rate limit of max 10 requests per second
+                page_num += 1 # For logger
+                logger.debug(f"Fetching page | sid={sid} | direction={cit} | page={page_num} | cursor={cursor}")
+                
                 response_data = requests.get(f'{oal_domain}works?mailto={my_email}&per-page={ppg}&cursor={cursor}&select={",".join(fields_to_return)}&filter={cit}:{sid}').json()
                 while 'error' in response_data:
+                    logger.error(f"API error | sid={sid} | page={page_num} | error={response_data['error']}")
                     wait_permission = get_wait_permission(your_title=response_data['error'], your_message="Do you want to wait until your API credits refresh?\n" + \
                                                           "Select Yes and keep this process running to resume after midnight UTC.\n" + \
                                                           "Select No to end this process and keep any data you've collected so far.")
                     if wait_permission:
-                        # Wait until 1 second after midnight, UTC
-                        time_until_reset = ((datetime.now(timezone.utc) + timedelta(days=1)).replace(hour=0, minute=0, second=1, microsecond=0) - datetime.now(timezone.utc)).total_seconds()
+                        # Wait until 1 minute after midnight, UTC
+                        time_until_reset = ((datetime.now(timezone.utc) + timedelta(days=1)).replace(hour=0, minute=1, second=0, microsecond=0) - datetime.now(timezone.utc)).total_seconds()
+                        logger.info(f"Waiting for reset | seconds={time_until_reset:.0f}")
                         show_countdown_timer(your_title="Waiting", seconds=time_until_reset)
                         response_data = requests.get(f'{oal_domain}works?mailto={my_email}&per-page={ppg}&cursor={cursor}&select={",".join(fields_to_return)}&filter={cit}:{sid}').json()
                     else:
                         # Cancel the process
+                        logger.warning("User cancelled process during API error wait.")
                         show_completion_message(your_title="Process Cancelled", your_message=response_data['error'])
                         sys.exit(3) # Terminate with code 3, API error
                 cursor = response_data['meta'].get('next_cursor')
                 
                 # Append latest page of results to the results file
                 res_count = len(response_data['results'])
+                
+                # For logger
+                total_fetched += res_count
+                logger.debug(
+                    f"Page result | sid={sid} | direction={cit} | page={page_num} "
+                    f"| results_this_page={res_count} | total_so_far={total_fetched} "
+                    f"| next_cursor={'None' if cursor is None else 'present'}"
+                )
+                
                 if res_count > 0:
                     pd.DataFrame(response_data['results']).assign(direction=[cit]*res_count, degrees=[degct]*res_count).to_csv(file_path, mode='a', sep='|', index=False, header=False)
                     next_ids = pd.concat([next_ids, pd.DataFrame({'cit': [cit]*res_count, 'id': [res['id'] for res in response_data['results']]})], ignore_index=True)
+
+            logger.info(
+              f"Completed | sid={sid} | direction={cit} | pages={page_num} "
+              f"| total_fetched={total_fetched} | expected={cit_count}"
+            )
+            if total_fetched != cit_count:
+                logger.warning(
+                    f"COUNT MISMATCH | sid={sid} | direction={cit} "
+                    f"| expected={cit_count} | actual={total_fetched}"
+                )
+            else:
+                logger.info(f"No results | sid={sid} | direction={cit}")
 
 # Prepare for next iteration
 next_ids['id'] = next_ids['id'].str.replace('https://openalex.org/', '', regex=True)
 seed_ids = next_ids
 
 # Clean up temporary objects
-for var in [cit, cit_count, cursor, degct, next_ids, res_count, response_data, ppg, sid, time_until_reset]:
-  if var in dir():
-    del var
+#for var in [cit, cit_count, cursor, degct, next_ids, res_count, response_data, ppg, sid, time_until_reset, wait_permission]:
+#  if var in dir():
+#    del var
 gc.collect()
