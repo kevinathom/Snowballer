@@ -11,7 +11,6 @@ from datetime import datetime, timezone, timedelta
 import requests
 
 # Define functions
-## Show text entry window
 def get_wait_permission(your_title="Process Paused", your_message="Do you want to wait?"):
     """
     Open a dialog window prompting asking the user whether to wait.
@@ -132,6 +131,37 @@ def show_countdown_timer(your_title="Countdown Timer", your_message="Resuming in
     root.destroy()
     return result[0]
 
+def call_api(request_string):
+  """
+  Call the OpenAlex API and return the response in JSON format.
+  Handle any error response.
+  
+  Args:
+    request_string (str): OpenAlex web address with API call parameters
+  
+  Returns:
+    json: OpenAlex API response, converted to JSON
+  """
+  response_data = requests.get(request_string).json()
+  if 'error' in response_data:
+    logger.error(f"API error | sid={sid} | page={page_num} | error={response_data['error']}")
+    wait_permission = get_wait_permission(your_title=response_data['error'], your_message="Do you want to wait until your API credits refresh?\n" + \
+                                                  "Select Yes and keep this process running to resume after midnight UTC.\n" + \
+                                                  "Select No to end this process and collect any data you've extracted so far.")
+    if wait_permission:
+      # Wait until 1 minute after midnight, UTC
+      time_now = datetime.now(timezone.utc)
+      time_until_reset = ((time_now + timedelta(days=1)).replace(hour=0, minute=1, second=0, microsecond=0) - time_now).total_seconds()
+      logger.info(f"Waiting for reset | seconds={time_until_reset:.0f}")
+      show_countdown_timer(your_title="Waiting", seconds=time_until_reset)
+      response_data = call_api(request_string)
+    else:
+      # Cancel the process
+      logger.warning("User cancelled process during API error wait.")
+      show_completion_message(your_title="Process Cancelled", your_message=response_data['error'])
+      sys.exit(3) # Terminate with code 3, API error
+  return response_data
+
 """
 Temporary: Logger for troubleshooting
 """
@@ -189,22 +219,7 @@ for cit in cite_degrees[deg]:
         pd.DataFrame(columns=fields_to_return+['direction','degrees']).to_csv(file_path, sep='|', index=False)
         
         # Get result count
-        response_data = requests.get(f'{oal_domain}works?mailto={my_email}&per-page=1&page=1&select=id&filter={cit}:{sid}').json()
-        #wait_permission = None
-        #time_until_reset = None
-        while 'error' in response_data:
-            wait_permission = get_wait_permission(your_title=response_data['error'], your_message="Do you want to wait until your API credits refresh?\n" + \
-                                                  "Select Yes and keep this process running to resume after midnight UTC.\n" + \
-                                                  "Select No to end this process and keep any data you've collected so far.")
-            if wait_permission:
-                # Wait until 1 minute after midnight, UTC
-                time_until_reset = ((datetime.now(timezone.utc) + timedelta(days=1)).replace(hour=0, minute=1, second=0, microsecond=0) - datetime.now(timezone.utc)).total_seconds()
-                show_countdown_timer(your_title="Waiting", seconds=time_until_reset)
-                response_data = requests.get(f'{oal_domain}works?mailto={my_email}&per-page=1&page=1&select=id&filter={cit}:{sid}').json()
-            else:
-                # Cancel the process
-                show_completion_message(your_title="Process Cancelled", your_message=response_data['error'])
-                sys.exit(3) # Terminate with code 3, API error
+        response_data = call_api(request_string=f'{oal_domain}works?mailto={my_email}&per-page=1&page=1&select=id&filter={cit}:{sid}')
         cit_count = response_data['meta']['count']
         logger.info(f"Result count | sid={sid} | direction={cit} | count={cit_count}")
         
@@ -222,23 +237,7 @@ for cit in cite_degrees[deg]:
                 page_num += 1 # For logger
                 logger.debug(f"Fetching page | sid={sid} | direction={cit} | page={page_num} | cursor={cursor}")
                 
-                response_data = requests.get(f'{oal_domain}works?mailto={my_email}&per-page={ppg}&cursor={cursor}&select={",".join(fields_to_return)}&filter={cit}:{sid}').json()
-                while 'error' in response_data:
-                    logger.error(f"API error | sid={sid} | page={page_num} | error={response_data['error']}")
-                    wait_permission = get_wait_permission(your_title=response_data['error'], your_message="Do you want to wait until your API credits refresh?\n" + \
-                                                          "Select Yes and keep this process running to resume after midnight UTC.\n" + \
-                                                          "Select No to end this process and keep any data you've collected so far.")
-                    if wait_permission:
-                        # Wait until 1 minute after midnight, UTC
-                        time_until_reset = ((datetime.now(timezone.utc) + timedelta(days=1)).replace(hour=0, minute=1, second=0, microsecond=0) - datetime.now(timezone.utc)).total_seconds()
-                        logger.info(f"Waiting for reset | seconds={time_until_reset:.0f}")
-                        show_countdown_timer(your_title="Waiting", seconds=time_until_reset)
-                        response_data = requests.get(f'{oal_domain}works?mailto={my_email}&per-page={ppg}&cursor={cursor}&select={",".join(fields_to_return)}&filter={cit}:{sid}').json()
-                    else:
-                        # Cancel the process
-                        logger.warning("User cancelled process during API error wait.")
-                        show_completion_message(your_title="Process Cancelled", your_message=response_data['error'])
-                        sys.exit(3) # Terminate with code 3, API error
+                response_data = call_api(request_string=f'{oal_domain}works?mailto={my_email}&per-page={ppg}&cursor={cursor}&select={",".join(fields_to_return)}&filter={cit}:{sid}')
                 cursor = response_data['meta'].get('next_cursor')
                 
                 # Append latest page of results to the results file
