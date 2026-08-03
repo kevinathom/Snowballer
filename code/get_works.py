@@ -5,6 +5,21 @@ Created on Wed Mar  5 11:17:17 2025
 Purpose: Retrieve works at a given degree of separation
 """
 
+# Logger for troubleshooting
+import logging
+import os
+
+# Only configure the logger once (since get_works.py is exec()'d in a loop)
+if not logging.getLogger('snowballer').handlers:
+    log_path = os.path.join(data_dir, 'snowballer_debug.log')
+    handler = logging.FileHandler(log_path, encoding='utf-8')
+    handler.setFormatter(logging.Formatter('%(asctime)s | %(levelname)s | %(message)s'))
+    logger = logging.getLogger('snowballer')
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(handler)
+else:
+    logger = logging.getLogger('snowballer')
+
 # Load dependencies
 import time
 from datetime import datetime, timezone, timedelta
@@ -157,27 +172,10 @@ def call_api(request_string):
       response_data = call_api(request_string)
     else:
       # Cancel the process
-      logger.warning("User cancelled process during API error wait.")
+      logger.warning("User did not wait during API error.")
       show_completion_message(your_title="Process Cancelled", your_message=response_data['error'])
       sys.exit(3) # Terminate with code 3, API error
   return response_data
-
-"""
-Temporary: Logger for troubleshooting
-"""
-import logging
-import os
-
-# Only configure the logger once (since get_works.py is exec()'d in a loop)
-if not logging.getLogger('snowballer').handlers:
-    log_path = os.path.join(data_dir, 'snowballer_debug.log')
-    handler = logging.FileHandler(log_path, encoding='utf-8')
-    handler.setFormatter(logging.Formatter('%(asctime)s | %(levelname)s | %(message)s'))
-    logger = logging.getLogger('snowballer')
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(handler)
-else:
-    logger = logging.getLogger('snowballer')
 
 """
 Set initial information
