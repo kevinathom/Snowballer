@@ -11,7 +11,7 @@ def clean_work_ids(ids_list):
   Clean, standardize, and deduplicate OpenAlex work IDs
   
   Args:
-    ids (list): Work IDs, potentially mixed with other content
+    ids_list (list): Work IDs, potentially mixed with other content
   
   Returns:
     list: Clean work IDs
