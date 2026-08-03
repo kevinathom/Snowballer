@@ -11,9 +11,18 @@ import sys
 import pandas as pd
 import gc
 
-# Create directory resolver function
+# Create functions
 def resolve_path(relative_path):
-  """Get absolute path to resource, works for dev and for PyInstaller"""
+  """
+  Get the absolute path for a given resource.
+  Works for dev and for PyInstaller.
+  
+  Args:
+    relative_path (str): The relative path to the resource
+  
+  Returns:
+    str: The absolute path to the resource
+  """
   
   try:
     # PyInstaller creates a temp folder and stores the path in _MEIPASS
@@ -26,17 +35,21 @@ def resolve_path(relative_path):
     
   return os.path.join(base_path, relative_path)
 
+"""
+Run process
+"""
+
 # Hard-code code directory
 code_dir = resolve_path('')
 
 # Collect initializing details from user
 exec(open(os.path.join(code_dir, 'user_variables.py')).read())
 
-# Encode degrees of separation
-exec(open(os.path.join(code_dir, 'degrees_separation.py')).read())
-
 # Read seed work IDs
 exec(open(os.path.join(code_dir, 'read_seeds.py')).read())
+
+# Encode degrees of separation
+exec(open(os.path.join(code_dir, 'degrees_separation.py')).read())
 
 # Get works for each degree of separation
 # Initialize API domain
@@ -55,6 +68,7 @@ for deg in range(len(cite_degrees)):
         cites_degct += 1
     # Get works
     exec(open(os.path.join(code_dir, 'get_works.py')).read())
+    #exec(open(os.path.join(code_dir, 'dedup_works.py')).read())
 
 # Clean up temporary objects
 #for var in [cite_degrees, cited_by_degct, cites_degct, deg, fields_to_return, my_email, oal_domain, seed_ids]:
@@ -65,7 +79,7 @@ for deg in range(len(cite_degrees)):
 exec(open(os.path.join(code_dir, 'dedup_works.py')).read())
 
 # Clean up temporary objects
-del code_dir, data_dir
+#del code_dir, data_dir
 gc.collect()
 
 # Show completion message
