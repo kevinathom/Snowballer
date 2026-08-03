@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Mar  5 11:11:53 2025
-@author: kevinatpenn
+@author: kevinathom
 Purpose: Generate an object that encodes all degrees of 
     separation to retrieve (relative to seed works)
 """
+
+#!!!To do: Convert the result to a dictionary for easier handling per direction/degree
 
 # Initialize objects
 cite_degrees = []
