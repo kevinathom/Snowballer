@@ -177,6 +177,8 @@ if (
 for key in dirdegs_dict.copy(): # Copy avoids a RuntimeError from changing the dictionary while iterating
   if dirdegs_dict[key] < 1:
     dirdegs_dict.pop(key)
+  else:
+    dirdegs_dict[key] = list(range(1, dirdegs_dict[key]+1))
 
 ## Set directories
 data_dir = open_directory_dialog(your_title = "Select a directory to hold working and results files.")
