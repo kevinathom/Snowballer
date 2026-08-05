@@ -6,10 +6,11 @@ Purpose: Orchestrate scripts to perform a citation chase / snowball literature s
 """
 
 # Load dependencies
-import os
-import sys
-import pandas as pd
 import gc
+import os
+import pandas as pd
+import sys
+import time
 
 # Create functions
 def resolve_path(relative_path):
@@ -38,7 +39,6 @@ def resolve_path(relative_path):
 """
 Run process
 """
-
 # Hard-code code directory
 code_dir = resolve_path('')
 
@@ -48,16 +48,26 @@ exec(open(os.path.join(code_dir, 'user_variables.py')).read())
 # Read seed work IDs
 exec(open(os.path.join(code_dir, 'read_seeds.py')).read())
 
-# Encode degrees of separation
+# Get and deduplicate works
+oal_domain = 'https://api.openalex.org/' # API domain
+working_dir = os.path.join(data_dir, f'snowball_results_{time.strftime("%Y%m%d-%H%M%S")}') # Working file directory
+os.makedirs(working_dir, exist_ok=True)
+for direction in dirdegs_dict.keys():
+  # Initialize work entity IDs for first degree of separation
+  next_ids = seed_ids
+  for degree in dirdegs_dict.get(direction):
+    # Initialize work entity IDs for next degree of separation
+    if degree > 1:
+      next_ids = future_ids
+    future_ids = []
+    exec(open(os.path.join(code_dir, 'get_works.py')).read())
+    exec(open(os.path.join(code_dir, 'dedup_works.py')).read())
+# To do: Concatenate incremental files and remove the working directory
+
+# Encode degrees of separation (legacy process)
 exec(open(os.path.join(code_dir, 'degrees_separation.py')).read())
 
-# Get works for each degree of separation
-# Initialize API domain
-oal_domain = 'https://api.openalex.org/'
-# Configure work entity IDs for first degree of separation
-seed_ids = pd.DataFrame({'cit': ['seed'] * len(seed_ids), 'id': seed_ids})
-
-# For each degree of separation
+# For each degree of separation (legacy process)
 cited_by_degct = 0
 cites_degct = 0
 for deg in range(len(cite_degrees)):
@@ -68,18 +78,15 @@ for deg in range(len(cite_degrees)):
         cites_degct += 1
     # Get works
     exec(open(os.path.join(code_dir, 'get_works.py')).read())
-    #exec(open(os.path.join(code_dir, 'dedup_works.py')).read())
 
 # Clean up temporary objects
 #for var in [cite_degrees, cited_by_degct, cites_degct, deg, fields_to_return, my_email, oal_domain, seed_ids]:
 #  if var in dir():
 #    del var
 
-# De-duplicate results
+# De-duplicate results (legacy process)
 exec(open(os.path.join(code_dir, 'dedup_works.py')).read())
 
-# Clean up temporary objects
-#del code_dir, data_dir
 gc.collect()
 
 # Show completion message
