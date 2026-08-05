@@ -1,21 +1,29 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Mar  5 11:19:43 2025
-@author: kevinatpenn
+@author: kevinathom
 Purpose: Remove duplicate works and consolidate files
 """
 
-# Load dependencies
-import re
-import time
+# List unique direction-degree values
+#import re
+#dirdegs = set([re.findall(r'W\d+_(cite[a-z_]+_\d+)\.txt', f) for f in fls]) #not a flat list
+
+def list_files(directory, file_extension = ''):
+  """
+  Lists files in a given directory. Limits results to files that match a file
+  extension (case insensitive) if provided or all files if not. Not recursive.
+  
+  Args:
+    directory (str): Directory to search for files
+    file_extension (str): 
+  
+  """
+  files = [f for f in os.listdir(directory) if f.lower().endswith(file_extension)]
+  return files
 
 # List TXT files in data directory
-working_dir = os.path.join(data_dir, 'working')
-fls = [f for f in os.listdir(working_dir) if f.lower().endswith('.txt')]
-
-# List unique direction-degree values
-dirdegs = set([re.findall(r'W\d+_(cite[a-z_]+_\d+)\.txt', f) for f in fls])
-#flatten this list!!!!!!
+fls = list_files(directory=working_dir, file_extension='.txt')
 
 # De-duplicate results
 if fls:
@@ -31,12 +39,10 @@ if fls:
         works = pd.concat([works, next_df], ignore_index=True).drop_duplicates()
     
     # Save results (to consolidated file)
-    works.to_csv(os.path.join(data_dir, f'works_snowball_{time.strftime("%Y%m%d-%H%M%S")}.csv'), sep=',', index=False)
+    works.to_csv(os.path.join(working_dir, f'works_snowball_{direction}_{degree}.csv'), sep=',', index=False)
 
-# Clean up temporary objects
+# Clean up temporary directory
 for file in fls:
     os.remove(os.path.join(working_dir, file))
-os.rmdir(working_dir)
 
-#del fl, fls, works
 gc.collect()
