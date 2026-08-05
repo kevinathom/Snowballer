@@ -10,18 +10,18 @@ Purpose: Create lists of direction and degree of separation
 cite_degrees = []
 
 # Create vectors
-#try this?: dirdegs_dict.get('cited_by') is not None
-#might have an issue with the pop process too
-while (('cited_by' in dirdegs_dict and dirdegs_dict['cited_by'] is not None)
-       or ('cites' in dirdegs_dict and dirdegs_dict['cites'] is not None)):
+while (
+  (dirdegs_dict.get('cited_by') is not None and dirdegs_dict.get('cited_by') != [])
+  or (dirdegs_dict.get('cites') is not None and dirdegs_dict.get('cites') != [])
+):
   
-  cb_multiplier = 'cited_by' in dirdegs_dict or dirdegs_dict['cited_by'] is not None
+  cb_multiplier = dirdegs_dict.get('cited_by') is not None and dirdegs_dict.get('cited_by') != []
   if cb_multiplier:
-    dirdegs_dict.pop('cited_by')
+    dirdegs_dict.get('cited_by').pop()
   
-  c_multiplier = 'cites' in dirdegs_dict or dirdegs_dict['cites'] is not None
+  c_multiplier = dirdegs_dict.get('cites') is not None and dirdegs_dict.get('cites') != []
   if c_multiplier:
-    dirdegs_dict.pop('cites')
+    dirdegs_dict.get('cites').pop()
     
   # Create a vector for the current degree of separation
   cite_degrees.append(['cited_by'] * cb_multiplier + ['cites'] * c_multiplier)
