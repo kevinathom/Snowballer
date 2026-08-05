@@ -2,7 +2,7 @@
 """
 Created on Wed Mar  5 11:17:17 2025
 @author: kevinathom
-Purpose: Retrieve works at a given degree of separation
+Purpose: Retrieve works at a given direction and degree of separation
 """
 
 # Logger for troubleshooting
@@ -159,7 +159,7 @@ def call_api(request_string):
   """
   response_data = requests.get(request_string).json()
   if 'error' in response_data:
-    logger.error(f"API error | sid={sid} | page={page_num} | error={response_data['error']}")
+    logger.error(f"API error | seed_id={wid} | page={page_num} | error={response_data['error']}")
     wait_permission = get_wait_permission(your_title=response_data['error'], your_message="Do you want to wait until your API credits refresh?\n" + \
                                                   "Select Yes and keep this process running to resume after midnight UTC.\n" + \
                                                   "Select No to end this process and collect any data you've extracted so far.")
@@ -228,7 +228,7 @@ for wid in next_ids:
       
       if res_count > 0:
         pd.DataFrame(response_data['results']).assign(direction=[direction]*res_count, degrees=[degree]*res_count).to_csv(file_path, mode='a', sep='|', index=False, header=False)
-        future_ids = future_ids + res['id'] for res in response_data['results']
+        future_ids = future_ids + [res['id'] for res in response_data['results']]
     
     logger.info(
       f"Completed | seed_id={wid} | direction={direction} | degree={degree} | pages={page_num} "
@@ -243,97 +243,6 @@ for wid in next_ids:
       logger.info(f"No results | seed_id={wid} | direction={direction} | degree={degree}")
 
 # Prepare for next iteration
-future_ids = future_ids.str.replace('https://openalex.org/', '', regex=True)
+future_ids = [re.sub('https://openalex.org/', '', wid) for wid in future_ids]
 
-"""
-Get works cited by and/or citing the current degree of separation's works (legacy)
-"""
-# Work entity ID storage for next degree of separation
-next_ids = pd.DataFrame({'cit': [], 'id': []})
-# Working file directory
-os.makedirs(os.path.join(data_dir, 'working'), exist_ok=True)
-
-# For each preference in cite_degrees
-for cit in cite_degrees[deg]:
-    
-    # Clean and count cit value
-    if not isinstance(cit, str):
-        cit = cit[0]
-    if 'cited_by' in cit:
-        degct = cited_by_degct
-    elif 'cites' in cit:
-        degct = cites_degct
-    
-    # For each work entity ID
-    for sid in seed_ids.loc[(seed_ids['cit'] == 'seed') | (seed_ids['cit'] == cit), 'id']:
-        
-        # Temporary: for logger
-        logger.info(f"Processing | direction={cit} | degree={deg} | seed_id={sid}")
-        
-        # Skip if file exists
-        file_path = os.path.normpath(os.path.join(data_dir, 'working', f'{sid}_{cit}_{degct}.txt'))
-        if os.path.exists(file_path):
-            logger.warning(f"SKIPPED (file exists) | sid={sid} | path={file_path}")
-            continue
-        
-        # Initialize results storage (to file)
-        pd.DataFrame(columns=fields_to_return+['direction','degrees']).to_csv(file_path, sep='|', index=False)
-        
-        # Get result count
-        response_data = call_api(request_string=f'{oal_domain}works?mailto={my_email}&per-page=1&page=1&select=id&filter={cit}:{sid}')
-        cit_count = response_data['meta']['count']
-        logger.info(f"Result count | sid={sid} | direction={cit} | count={cit_count}")
-        
-        # If there are citations
-        if cit_count > 0:
-            cursor = '*'  # Starts pagination
-            ppg = 200  # Results per page
-            # For logger
-            page_num = 0
-            total_fetched = 0
-            
-            # While there are results remaining
-            while cursor is not None:
-                time.sleep(0.1)  # Obey public API rate limit of max 10 requests per second
-                page_num += 1 # For logger
-                logger.debug(f"Fetching page | sid={sid} | direction={cit} | page={page_num} | cursor={cursor}")
-                
-                response_data = call_api(request_string=f'{oal_domain}works?mailto={my_email}&per-page={ppg}&cursor={cursor}&select={",".join(fields_to_return)}&filter={cit}:{sid}')
-                cursor = response_data['meta'].get('next_cursor')
-                
-                # Append latest page of results to the results file
-                res_count = len(response_data['results'])
-                
-                # For logger
-                total_fetched += res_count
-                logger.debug(
-                    f"Page result | sid={sid} | direction={cit} | page={page_num} "
-                    f"| results_this_page={res_count} | total_so_far={total_fetched} "
-                    f"| next_cursor={'None' if cursor is None else 'present'}"
-                )
-                
-                if res_count > 0:
-                    pd.DataFrame(response_data['results']).assign(direction=[cit]*res_count, degrees=[degct]*res_count).to_csv(file_path, mode='a', sep='|', index=False, header=False)
-                    next_ids = pd.concat([next_ids, pd.DataFrame({'cit': [cit]*res_count, 'id': [res['id'] for res in response_data['results']]})], ignore_index=True)
-
-            logger.info(
-              f"Completed | sid={sid} | direction={cit} | pages={page_num} "
-              f"| total_fetched={total_fetched} | expected={cit_count}"
-            )
-            if total_fetched != cit_count:
-                logger.warning(
-                    f"COUNT MISMATCH | sid={sid} | direction={cit} "
-                    f"| expected={cit_count} | actual={total_fetched}"
-                )
-            else:
-                logger.info(f"No results | sid={sid} | direction={cit}")
-
-# Prepare for next iteration
-next_ids['id'] = next_ids['id'].str.replace('https://openalex.org/', '', regex=True)
-seed_ids = next_ids
-
-# Clean up temporary objects
-#for var in [cit, cit_count, cursor, degct, next_ids, res_count, response_data, ppg, sid, time_until_reset, wait_permission]:
-#  if var in dir():
-#    del var
 gc.collect()
