@@ -168,13 +168,13 @@ dirdegs_dict = {
 }
 if (
   not ('dirdegs_dict' in locals() or 'dirdegs_dict' in globals())
-  or (('cited_by' not in dirdegs_dict or dirdegs_dict['cited_by'] == None or dirdegs_dict['cited_by'] == '' or dirdegs_dict['cited_by'] == 0)
-      and ('cites' not in dirdegs_dict or dirdegs_dict['cites'] == None or dirdegs_dict['cites'] == '' or dirdegs_dict['cites'] == 0)
+  or ((dirdegs_dict.get('cited_by') is None or dirdegs_dict['cited_by'] == '' or dirdegs_dict['cited_by'] == 0)
+      and (dirdegs_dict.get('cites') is None or dirdegs_dict['cites'] == '' or dirdegs_dict['cites'] == 0)
   )
 ):
   show_completion_message(your_title="Process Cancelled", your_message="No degrees of separation were set.")
   sys.exit(4) # Terminate with code 4, no degrees of separation
-for key in dirdegs_dict.copy(): # Copy avoids a RuntimeError from changing the dictionary while iterating
+for key in dirdegs_dict.copy(): # Copy avoids a RuntimeError after changing the dictionary while iterating
   if dirdegs_dict[key] < 1:
     dirdegs_dict.pop(key)
   else:
