@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Mar  5 11:17:17 2025
-@author: kevinatpenn
+@author: kevinathom
 Purpose: Retrieve works at a given degree of separation
 """
 
@@ -178,18 +178,81 @@ def call_api(request_string):
   return response_data
 
 """
-Set initial information
+Get works for one direction and degree of separation
 """
+for wid in next_ids:
+  logger.info(f"Processing | direction={direction} | degree={degree} | seed_id={wid}")
+  
+  # Skip if file exists
+  file_path = os.path.normpath(os.path.join(working_dir, f'{wid}.txt'))
+  if os.path.exists(file_path):
+    logger.warning(f"SKIPPED (file exists) | seed_id={wid} | path={file_path}")
+    continue
+  
+  # Initialize results storage (to file)
+  pd.DataFrame(columns=fields_to_return+['direction','degrees']).to_csv(file_path, sep='|', index=False)
+  
+  # Get result count
+  response_data = call_api(request_string=f'{oal_domain}works?mailto={my_email}&per-page=1&page=1&select=id&filter={direction}:{wid}')
+  cit_count = response_data['meta']['count']
+  logger.info(f"Result count | seed_id={wid} | direction={direction} | degree={degree} | count={cit_count}")
+  
+  # If there are citations
+  if cit_count > 0:
+    cursor = '*'  # Starts pagination
+    ppg = 200  # Results per page
+    # For logger
+    page_num = 0
+    total_fetched = 0
+    
+    # While there are results remaining
+    while cursor is not None:
+      time.sleep(0.1)  # Obey public API rate limit of max 10 requests per second
+      # For logger
+      page_num += 1
+      logger.debug(f"Fetching page | seed_id={wid} | direction={direction} | degree={degree} | page={page_num} | cursor={cursor}")
+      
+      response_data = call_api(request_string=f'{oal_domain}works?mailto={my_email}&per-page={ppg}&cursor={cursor}&select={",".join(fields_to_return)}&filter={direction}:{wid}')
+      cursor = response_data['meta'].get('next_cursor')
+      
+      # Append latest page of results to the results file
+      res_count = len(response_data['results'])
+      
+      # For logger
+      total_fetched += res_count
+      logger.debug(
+        f"Page result | seed_id={wid} | direction={direction} | degree={degree} | page={page_num} "
+        f"| results_this_page={res_count} | total_so_far={total_fetched} "
+        f"| next_cursor={'None' if cursor is None else 'present'}"
+      )
+      
+      if res_count > 0:
+        pd.DataFrame(response_data['results']).assign(direction=[direction]*res_count, degrees=[degree]*res_count).to_csv(file_path, mode='a', sep='|', index=False, header=False)
+        future_ids = future_ids + res['id'] for res in response_data['results']
+    
+    logger.info(
+      f"Completed | seed_id={wid} | direction={direction} | degree={degree} | pages={page_num} "
+      f"| total_expected={cit_count} | total_fetched={total_fetched}"
+    )
+    if total_fetched != cit_count:
+      logger.warning(
+        f"COUNT MISMATCH | seed_id={wid} | direction={direction} | degree={degree} "
+        f"| total_expected={cit_count} | total_fetched={total_fetched}"
+      )
+    else:
+      logger.info(f"No results | seed_id={wid} | direction={direction} | degree={degree}")
 
+# Prepare for next iteration
+future_ids = future_ids.str.replace('https://openalex.org/', '', regex=True)
+
+"""
+Get works cited by and/or citing the current degree of separation's works (legacy)
+"""
 # Work entity ID storage for next degree of separation
 next_ids = pd.DataFrame({'cit': [], 'id': []})
 # Working file directory
 os.makedirs(os.path.join(data_dir, 'working'), exist_ok=True)
 
-"""
-Get works cited by and/or citing
-    the current degree of separation's works
-"""
 # For each preference in cite_degrees
 for cit in cite_degrees[deg]:
     
