@@ -28,29 +28,6 @@ import requests
 """
 Define functions
 """
-def get_wait_permission(your_title="Process Paused", your_message="Do you want to wait?"):
-    """
-    Open a dialog window prompting asking the user whether to wait.
-
-    Args:
-        your_title (str): The title of the dialog box
-        your_message (str): The yes/no question displayed to the user
-
-    Returns:
-        bool: True if the user clicks Yes (wait), False if the user clicks No (end process)
-    """
-    # Initialize then hide tkinter
-    root = tk.Tk()
-    root.withdraw()
-    # Show the yes/no dialog and get the user's response
-    result = messagebox.askyesno(
-        title=your_title,
-        message=your_message
-    )
-    # Clean up the tkinter instance
-    root.destroy()
-    return result  # True = Yes (wait), False = No (end process)
-
 def show_countdown_timer(your_title="Countdown Timer", your_message="Resuming in:", hours=0, minutes=0, seconds=0):
     """
     Open a dialog window displaying a countdown timer in hours, minutes, and seconds.
@@ -154,7 +131,7 @@ def call_api(url, max_retries=5):
   On API error, retry or except. Wait time between tries increases with each try.
   
   Args:
-    request_string (str): OpenAlex web address with API call parameters
+    url (str): OpenAlex web address with API call parameters
     max_retries (int): The maximum number of time to retry the API call after an error
   
   Returns:
@@ -210,37 +187,6 @@ def call_api(url, max_retries=5):
   logger.error(f"API error | seed_id={wid} | page={page_num} | error=Call failed after {attempt} retry attempts")
   raise Exception(f"Failed after {max_retries} retries")
 
-def call_api_legacy(request_string):
-  """
-  Call the OpenAlex API and return the response in JSON format.
-  Handle any error response.
-  
-  Args:
-    request_string (str): OpenAlex web address with API call parameters
-  
-  Returns:
-    json: OpenAlex API response, converted to JSON
-  """
-  response_data = fetch_with_retry(url=request_string)
-  if 'error' in response_data:
-    logger.error(f"API error | seed_id={wid} | page={page_num} | error={response_data['error']}")
-    wait_permission = get_wait_permission(your_title=response_data['error'], your_message="Do you want to wait until your API credits refresh?\n" + \
-                                                  "Select Yes and keep this process running to resume after midnight UTC.\n" + \
-                                                  "Select No to end this process and collect any data you've extracted so far.")
-    if wait_permission:
-      # Wait until 1 minute after midnight, UTC
-      time_now = datetime.now(timezone.utc)
-      time_until_reset = ((time_now + timedelta(days=1)).replace(hour=0, minute=1, second=0, microsecond=0) - time_now).total_seconds()
-      logger.info(f"Waiting for reset | seconds={time_until_reset:.0f}")
-      show_countdown_timer(your_title="Waiting", seconds=time_until_reset)
-      response_data = call_api(request_string)
-    else:
-      # Cancel the process
-      logger.warning("User did not wait during API error.")
-      show_completion_message(your_title="Process Cancelled", your_message=response_data['error'])
-      sys.exit(3) # Terminate with code 3, API error
-  return response_data
-
 """
 Get works for one direction and degree of separation
 """
@@ -257,7 +203,7 @@ for wid in next_ids:
   pd.DataFrame(columns=fields_to_return+['direction','degrees']).to_csv(file_path, sep='|', index=False)
   
   # Get result count
-  response_data = call_api(request_string=f'{oal_domain}works?mailto={my_email}&per-page=1&page=1&select=id&filter={direction}:{wid}')
+  response_data = call_api(url=f'{oal_domain}works?mailto={my_email}&per-page=1&page=1&select=id&filter={direction}:{wid}')
   cit_count = response_data['meta']['count']
   logger.info(f"Result count | seed_id={wid} | direction={direction} | degree={degree} | count={cit_count}")
   
@@ -276,7 +222,7 @@ for wid in next_ids:
       page_num += 1
       logger.debug(f"Fetching page | seed_id={wid} | direction={direction} | degree={degree} | page={page_num} | cursor={cursor}")
       
-      response_data = call_api(request_string=f'{oal_domain}works?mailto={my_email}&per-page={ppg}&cursor={cursor}&select={",".join(fields_to_return)}&filter={direction}:{wid}')
+      response_data = call_api(url=f'{oal_domain}works?mailto={my_email}&per-page={ppg}&cursor={cursor}&select={",".join(fields_to_return)}&filter={direction}:{wid}')
       cursor = response_data['meta'].get('next_cursor')
       
       # Append latest page of results to the results file
