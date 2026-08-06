@@ -64,29 +64,6 @@ for direction in dirdegs_dict.keys():
     exec(open(os.path.join(code_dir, 'dedup_works.py')).read())
 # To do: Concatenate incremental files and remove the working directory
 
-# Encode degrees of separation (legacy process)
-exec(open(os.path.join(code_dir, 'degrees_separation.py')).read())
-
-# For each degree of separation (legacy process)
-cited_by_degct = 0
-cites_degct = 0
-for deg in range(len(cite_degrees)):
-    # Increment counter
-    if 'cited_by' in cite_degrees[deg]:
-        cited_by_degct += 1
-    if 'cites' in cite_degrees[deg]:
-        cites_degct += 1
-    # Get works
-    exec(open(os.path.join(code_dir, 'get_works.py')).read())
-
-# Clean up temporary objects
-#for var in [cite_degrees, cited_by_degct, cites_degct, deg, fields_to_return, my_email, oal_domain, seed_ids]:
-#  if var in dir():
-#    del var
-
-# De-duplicate results (legacy process)
-exec(open(os.path.join(code_dir, 'dedup_works.py')).read())
-
 gc.collect()
 
 # Show completion message
