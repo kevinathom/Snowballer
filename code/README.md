@@ -1,14 +1,16 @@
 # Snowballer algorithm and development
 
 ## Reference documentation
-- [OpenAlex works filters](https://docs.openalex.org/api-entities/works/filter-works)
-- [Paging](https://docs.openalex.org/how-to-use-the-api/get-lists-of-entities/paging)
-- [Search works](https://docs.openalex.org/api-entities/works/search-works)
+- OpenAlex 
+	- [Works filters](https://docs.openalex.org/api-entities/works/filter-works)
+	- [Paging](https://docs.openalex.org/how-to-use-the-api/get-lists-of-entities/paging)
+	- [Search works](https://docs.openalex.org/api-entities/works/search-works)
+	- [Error Handling](https://developers.openalex.org/api-reference/errors)
 - [Turning a Python script into a website](https://blog.pythonanywhere.com/169/)
 - [Convert Python Script to .exe File](https://www.geeksforgeeks.org/convert-python-script-to-exe-file/)
 
 ## Note
-I compile via this line in a terminal: `python -m PyInstaller --onefile -w 'control.py' --hidden-import=tkinter --hidden-import=tkinter.simpledialog --hidden-import=tkinter.filedialog --hidden-import=tkinter.messagebox --hidden-import=requests --add-data "user_variables.py;." --add-data "degrees_separation.py;." --add-data "read_seeds.py;." --add-data "get_works.py;." --add-data "dedup_works.py;." --name=Snowballer`
+I compile via this line in a terminal: `python -m PyInstaller --onefile -w 'control.py' --hidden-import=tkinter --hidden-import=tkinter.simpledialog --hidden-import=tkinter.filedialog --hidden-import=tkinter.messagebox --hidden-import=requests --add-data "user_variables.py;." --add-data "read_seeds.py;." --add-data "get_works.py;." --add-data "dedup_works.py;." --name=Snowballer`
 
 ## Algorithm
 1. Get work entity ID(s)
@@ -18,7 +20,7 @@ I compile via this line in a terminal: `python -m PyInstaller --onefile -w 'cont
 1. Set the degrees of separation from seed articles to results
 	1. Input the maximum desired degrees for cites and cited_by (independently)
 	1. Encode for processing
-1. For each entity ID
+1. For each work entity ID
    1. Get works (cites or cited_by)
       1. Short query to get the number of works (see `meta` > `count` field)
       1. Loop to get all works
@@ -35,11 +37,11 @@ I compile via this line in a terminal: `python -m PyInstaller --onefile -w 'cont
 - Cites: `https://api.openalex.org/works?filter=cites:W3125944002`
 
 ## Aspirations
-- Dedup, combine, and export results at every combination of direction and degree of separation -- optionally concatenate these results into a single file
+- Concatenate results into a single file
 - Add error-handling for invalid content in seed file
 - Add window to show the process is happening (in case it's long)
 - Add messaging for no results
 - Add integrated testing script
 
 ## Limitations
-- OpenAlex does not offer abstracts. It can provide a table identified as *abstract_inverted_index* at the individual work level, but this cannot be exported as part of a list of works.
+- OpenAlex does not export abstracts. It can provide a table identified as *abstract_inverted_index* at the individual work level, but this cannot be exported as part of a list of works.
