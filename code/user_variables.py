@@ -14,7 +14,7 @@ import re
 import sys
 
 # Define functions
-def get_email_input(your_title="Email Input", your_message="Please enter your email address:", initial_value="user@domain.com"):
+def get_string_input(your_title="String Input", your_message="Please enter your text:", initial_value="", validate=""):
   """
   Open a simple dialog box to get email-formatted input from the user.
   
@@ -38,11 +38,14 @@ def get_email_input(your_title="Email Input", your_message="Please enter your em
   # Clean up the tkinter instance
   root.destroy()
   
-  # Confirm email format
-  if user_input == "user@domain.com":
+  if validate.lower() == ""
     return None
-  elif re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', user_input) is None:
-    return None
+  elif validate.lower() == "email":
+    # Confirm email format
+    if user_input == "user@domain.com":
+      return None
+    elif re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', user_input) is None:
+      return None
   else:
     return user_input
 
@@ -145,9 +148,14 @@ def show_completion_message(your_title="Process Complete", your_message="The pro
 Prompt user for variables
 """
 # Set user email
-my_email = get_email_input(your_title="Email", your_message="Enter your email address for the OpenAlex API.")
+my_email = get_string_input(your_title="Email", your_message="Enter your email address for the OpenAlex API.", initial_value="user@domain.com", validate="email")
 if not ('my_email' in locals() or 'my_email' in globals()) or my_email == None:
   my_email = ""
+
+# Set user API key
+my_key = get_string_input(your_title="API key", your_message="Enter your API key for the OpenAlex API.", initial_value="YOUR_KEY")
+if not ('my_key' in locals() or 'my_key' in globals()) or my_key == None:
+  my_key = ""
 
 # Set seed work entity ID(s)
 seed_file = open_file_dialog(your_title = "Select a CSV file containing the work entity ID(s) to use as a starting point.")
