@@ -25,7 +25,45 @@ import time
 from datetime import datetime, timezone, timedelta
 import requests
 
-# Define functions
+"""
+Define functions
+"""
+
+def fetch_with_retry(url, max_retries=5):
+  """
+  On API error, retry. Wait time between tries increases with each try.
+  """
+  for attempt in range(max_retries):
+    try:
+      response = requests.get(url, timeout=30)
+
+      if response.status_code == 200:
+        return response.json()
+
+      if response.status_code == 429:
+        # Rate limited - wait longer
+        wait_time = 2 ** attempt
+        time.sleep(wait_time)
+        continue
+
+      if response.status_code >= 500:
+        # Server error - retry
+        wait_time = 2 ** attempt
+        time.sleep(wait_time)
+        continue
+
+      # Client error - don't retry
+      response.raise_for_status()
+
+    except requests.exceptions.Timeout:
+      if attempt < max_retries - 1:
+        time.sleep(2 ** attempt)
+      else:
+        raise
+  
+  logger.error(f"API error | seed_id={wid} | page={page_num} | error=Call failed after {attempt} retry attempts")
+  raise Exception(f"Failed after {max_retries} retries")
+
 def get_wait_permission(your_title="Process Paused", your_message="Do you want to wait?"):
     """
     Open a dialog window prompting asking the user whether to wait.
@@ -157,7 +195,7 @@ def call_api(request_string):
   Returns:
     json: OpenAlex API response, converted to JSON
   """
-  response_data = requests.get(request_string).json()
+  response_data = fetch_with_retry(url=request_string)
   if 'error' in response_data:
     logger.error(f"API error | seed_id={wid} | page={page_num} | error={response_data['error']}")
     wait_permission = get_wait_permission(your_title=response_data['error'], your_message="Do you want to wait until your API credits refresh?\n" + \
