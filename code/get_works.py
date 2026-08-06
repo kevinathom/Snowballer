@@ -28,42 +28,6 @@ import requests
 """
 Define functions
 """
-
-def fetch_with_retry(url, max_retries=5):
-  """
-  On API error, retry. Wait time between tries increases with each try.
-  """
-  for attempt in range(max_retries):
-    try:
-      response = requests.get(url, timeout=30)
-
-      if response.status_code == 200:
-        return response.json()
-
-      if response.status_code == 429:
-        # Rate limited - wait longer
-        wait_time = 2 ** attempt
-        time.sleep(wait_time)
-        continue
-
-      if response.status_code >= 500:
-        # Server error - retry
-        wait_time = 2 ** attempt
-        time.sleep(wait_time)
-        continue
-
-      # Client error - don't retry
-      response.raise_for_status()
-
-    except requests.exceptions.Timeout:
-      if attempt < max_retries - 1:
-        time.sleep(2 ** attempt)
-      else:
-        raise
-  
-  logger.error(f"API error | seed_id={wid} | page={page_num} | error=Call failed after {attempt} retry attempts")
-  raise Exception(f"Failed after {max_retries} retries")
-
 def get_wait_permission(your_title="Process Paused", your_message="Do you want to wait?"):
     """
     Open a dialog window prompting asking the user whether to wait.
@@ -184,7 +148,69 @@ def show_countdown_timer(your_title="Countdown Timer", your_message="Resuming in
     root.destroy()
     return result[0]
 
-def call_api(request_string):
+def call_api(url, max_retries=5):
+  """
+  Call the OpenAlex API and return the response in JSON format.
+  On API error, retry or except. Wait time between tries increases with each try.
+  
+  Args:
+    request_string (str): OpenAlex web address with API call parameters
+    max_retries (int): The maximum number of time to retry the API call after an error
+  
+  Returns:
+    json: OpenAlex API response, converted to JSON
+  """
+  for attempt in range(max_retries):
+    try:
+      response = requests.get(url, timeout=30)
+
+      if response.status_code == 200:
+        return response.json()
+
+      if response.status_code == 429:
+        # Rate limited - wait until one minute after midnight UTC
+        time_now = datetime.now(timezone.utc)
+        wait_time = ((time_now + timedelta(days=1)).replace(hour=0, minute=1, second=0, microsecond=0) - time_now).total_seconds()
+        logger.info(f"Waiting to retry | seconds={wait_time:.0f}")
+        if show_countdown_timer(your_title="Rate limit error", seconds=wait_time):
+          continue
+        else:
+          logger.error(f"API error | seed_id={wid} | page={page_num} | error=User quit after {attempt} retry attempts | Error {response.status_code}")
+          show_completion_message(your_title="Process Cancelled", your_message=f'User prevented retry for error {response.status_code}.')
+          sys.exit(0)
+
+      if response.status_code >= 500:
+        # Server error - retry
+        wait_time = 2**attempt
+        logger.info(f"Waiting to retry | seconds={wait_time:.0f}")
+        if show_countdown_timer(your_title="Server error", seconds=wait_time):
+          continue
+        else:
+          logger.error(f"API error | seed_id={wid} | page={page_num} | error=User quit after {attempt} retry attempts | Error {response.status_code}")
+          show_completion_message(your_title="Process Cancelled", your_message=f'User prevented retry for error {response.status_code}.')
+          sys.exit(0)
+
+      # Client error - don't retry
+      logger.error(f"API error | seed_id={wid} | page={page_num} | error=Call failed after {attempt} retry attempts | Error {response.status_code}")
+      response.raise_for_status()
+
+    except requests.exceptions.Timeout:
+      if attempt < max_retries - 1:
+        wait_time = 2**attempt
+        logger.info(f"Waiting to retry | seconds={wait_time:.0f}")
+        if show_countdown_timer(your_title="Server error", seconds=wait_time):
+          continue
+        else:
+          logger.error(f"API error | seed_id={wid} | page={page_num} | error=User quit after {attempt} retry attempts | Error {response.status_code}")
+          show_completion_message(your_title="Process Cancelled", your_message=f'User prevented retry for timeout error.')
+          sys.exit(0)
+      else:
+        raise
+  
+  logger.error(f"API error | seed_id={wid} | page={page_num} | error=Call failed after {attempt} retry attempts")
+  raise Exception(f"Failed after {max_retries} retries")
+
+def call_api_legacy(request_string):
   """
   Call the OpenAlex API and return the response in JSON format.
   Handle any error response.
