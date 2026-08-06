@@ -1,9 +1,11 @@
 # Snowballer algorithm and development
 
 ## Reference documentation
-- [OpenAlex works filters](https://docs.openalex.org/api-entities/works/filter-works)
-- [Paging](https://docs.openalex.org/how-to-use-the-api/get-lists-of-entities/paging)
-- [Search works](https://docs.openalex.org/api-entities/works/search-works)
+- OpenAlex 
+	- [Works filters](https://docs.openalex.org/api-entities/works/filter-works)
+	- [Paging](https://docs.openalex.org/how-to-use-the-api/get-lists-of-entities/paging)
+	- [Search works](https://docs.openalex.org/api-entities/works/search-works)
+	- [Error Handling](https://developers.openalex.org/api-reference/errors)
 - [Turning a Python script into a website](https://blog.pythonanywhere.com/169/)
 - [Convert Python Script to .exe File](https://www.geeksforgeeks.org/convert-python-script-to-exe-file/)
 
