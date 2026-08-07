@@ -145,18 +145,23 @@ def show_completion_message(your_title="Process Complete", your_message="The pro
 """
 Prompt user for variables
 """
-# Set user email (mailto={my_email}& no longer required?)
-#my_email = get_string_input(your_title="Email", your_message="Enter your email address for the OpenAlex API.", initial_value="user@domain.com", validate="email")
-#if not ('my_email' in locals() or 'my_email' in globals()) or my_email == None:
-#  my_email = ""
-
 # Set user API key
-my_key = get_string_input(your_title="API key", your_message="Enter your API key for the OpenAlex API.\n"
+my_key = get_string_input(your_title="API key", your_message="Enter your API key for the OpenAlex API.\n" +\
                                                 "It's not required, but it lets you get more data per day.", initial_value="YOUR_KEY")
 if not ('my_key' in locals() or 'my_key' in globals()) or my_key == None or my_key == "YOUR_KEY" or my_key == "":
   my_key = ""
 else:
   my_key = f"api_key={my_key}&"
+  
+# Set user email
+if my_key == "":
+  my_email = get_string_input(your_title="Email", your_message="Enter your email address for the OpenAlex API.\n" +\
+                                                  "OpenAlex requires this for polite requests\n" +\
+                                                  "if you didn't supply an API key.", initial_value="user@domain.com", validate="email")
+if not ('my_email' in locals() or 'my_email' in globals()) or my_email == None or my_email == "user@domain.com" or my_email == "":
+  my_email = ""
+else:
+  my_email = f"mailto={my_email}&"
 
 # Set seed work entity ID(s)
 seed_file = open_file_dialog(your_title = "Select a CSV file containing the work entity ID(s) to use as a starting point.")
