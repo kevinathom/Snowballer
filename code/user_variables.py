@@ -38,9 +38,7 @@ def get_string_input(your_title="String Input", your_message="Please enter your 
   # Clean up the tkinter instance
   root.destroy()
   
-  if validate.lower() == "":
-    return None
-  elif validate.lower() == "email":
+  if validate.lower() == "email":
     # Confirm email format
     if user_input == "user@domain.com":
       return None
@@ -147,15 +145,18 @@ def show_completion_message(your_title="Process Complete", your_message="The pro
 """
 Prompt user for variables
 """
-# Set user email
-my_email = get_string_input(your_title="Email", your_message="Enter your email address for the OpenAlex API.", initial_value="user@domain.com", validate="email")
-if not ('my_email' in locals() or 'my_email' in globals()) or my_email == None:
-  my_email = ""
+# Set user email (mailto={my_email}& no longer required?)
+#my_email = get_string_input(your_title="Email", your_message="Enter your email address for the OpenAlex API.", initial_value="user@domain.com", validate="email")
+#if not ('my_email' in locals() or 'my_email' in globals()) or my_email == None:
+#  my_email = ""
 
 # Set user API key
-my_key = get_string_input(your_title="API key", your_message="Enter your API key for the OpenAlex API.", initial_value="YOUR_KEY")
-if not ('my_key' in locals() or 'my_key' in globals()) or my_key == None:
+my_key = get_string_input(your_title="API key", your_message="Enter your API key for the OpenAlex API.\n"
+                                                "It's not required, but it lets you get more data per day.", initial_value="YOUR_KEY")
+if not ('my_key' in locals() or 'my_key' in globals()) or my_key == None or my_key == "YOUR_KEY" or my_key = "":
   my_key = ""
+else:
+  my_key = f"api_key={my_key}&"
 
 # Set seed work entity ID(s)
 seed_file = open_file_dialog(your_title = "Select a CSV file containing the work entity ID(s) to use as a starting point.")
