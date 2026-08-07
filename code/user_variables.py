@@ -38,7 +38,7 @@ def get_string_input(your_title="String Input", your_message="Please enter your 
   # Clean up the tkinter instance
   root.destroy()
   
-  if validate.lower() == ""
+  if validate.lower() == "":
     return None
   elif validate.lower() == "email":
     # Confirm email format
