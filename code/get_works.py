@@ -203,7 +203,7 @@ for wid in next_ids:
   pd.DataFrame(columns=fields_to_return+['direction','degrees']).to_csv(file_path, sep='|', index=False)
   
   # Get result count
-  response_data = call_api(url=f'{oal_domain}works?{my_key}per-page=1&page=1&select=id&filter={direction}:{wid}')
+  response_data = call_api(url=f'{oal_domain}works?{my_email}{my_key}per-page=1&page=1&select=id&filter={direction}:{wid}')
   cit_count = response_data['meta']['count']
   logger.info(f"Result count | seed_id={wid} | direction={direction} | degree={degree} | count={cit_count}")
   
@@ -222,7 +222,7 @@ for wid in next_ids:
       page_num += 1
       logger.debug(f"Fetching page | seed_id={wid} | direction={direction} | degree={degree} | page={page_num} | cursor={cursor}")
       
-      response_data = call_api(url=f'{oal_domain}works?{my_key}per-page={ppg}&cursor={cursor}&select={",".join(fields_to_return)}&filter={direction}:{wid}')
+      response_data = call_api(url=f'{oal_domain}works?{my_email}{my_key}per-page={ppg}&cursor={cursor}&select={",".join(fields_to_return)}&filter={direction}:{wid}')
       cursor = response_data['meta'].get('next_cursor')
       
       # Append latest page of results to the results file
