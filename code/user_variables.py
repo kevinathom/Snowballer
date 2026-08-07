@@ -153,7 +153,7 @@ Prompt user for variables
 # Set user API key
 my_key = get_string_input(your_title="API key", your_message="Enter your API key for the OpenAlex API.\n"
                                                 "It's not required, but it lets you get more data per day.", initial_value="YOUR_KEY")
-if not ('my_key' in locals() or 'my_key' in globals()) or my_key == None or my_key == "YOUR_KEY" or my_key = "":
+if not ('my_key' in locals() or 'my_key' in globals()) or my_key == None or my_key == "YOUR_KEY" or my_key == "":
   my_key = ""
 else:
   my_key = f"api_key={my_key}&"
