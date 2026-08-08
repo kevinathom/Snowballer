@@ -11,7 +11,7 @@ import os
 
 # Only configure the logger once (since get_works.py is exec()'d in a loop)
 if not logging.getLogger('snowballer').handlers:
-    log_path = os.path.join(data_dir, 'snowballer_debug.log')
+    log_path = os.path.join(working_dir, 'snowballer_debug.log')
     handler = logging.FileHandler(log_path, encoding='utf-8')
     handler.setFormatter(logging.Formatter('%(asctime)s | %(levelname)s | %(message)s'))
     logger = logging.getLogger('snowballer')
