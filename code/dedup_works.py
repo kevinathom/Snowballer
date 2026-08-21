@@ -47,7 +47,7 @@ def join_file_content(files_to_join, input_directory=os.getcwd(), to_join_delimi
       content = pd.concat([content, next_df], ignore_index=True).drop_duplicates()
     
     # Save results to file
-    works.to_csv(os.path.join(output_directory, file_to_output), sep=output_delimiter, index=False)
+    content.to_csv(os.path.join(output_directory, file_to_output), sep=output_delimiter, index=False)
   
   if clean_up:
     for file in files_to_join:
