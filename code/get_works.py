@@ -150,7 +150,7 @@ def call_api(url, max_retries=5):
         wait_time = ((time_now + timedelta(days=1)).replace(hour=0, minute=1, second=0, microsecond=0) - time_now).total_seconds()
         logger.info(f"Waiting to retry | seconds={wait_time:.0f}")
         if show_countdown_timer(your_title="Rate limit error", seconds=wait_time):
-          continue
+          return ["retry_this_work"]
         else:
           logger.error(f"API error | seed_id={wid} | page={page_num} | error=User quit after {attempt} retry attempts | Error {response.status_code}")
           show_completion_message(your_title="Process Cancelled", your_message=f'User prevented retry for error {response.status_code}.')
@@ -223,7 +223,13 @@ for wid in next_ids:
       logger.debug(f"Fetching page | seed_id={wid} | direction={direction} | degree={degree} | page={page_num} | cursor={cursor}")
       
       response_data = call_api(url=f'{oal_domain}works?{my_email}{my_key}per-page={ppg}&cursor={cursor}&select={",".join(fields_to_return)}&filter={direction}:{wid}')
-      cursor = response_data['meta'].get('next_cursor')
+      if response_data == ["retry_this_work"]:
+        logger.info(f"Saving work to retry list | seed_id={wid}")
+        retry_ids.append(wid)
+        os.remove(file_path)
+        cursor = None
+      else:
+        cursor = response_data['meta'].get('next_cursor')
       
       # Append latest page of results to the results file
       res_count = len(response_data['results'])
