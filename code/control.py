@@ -64,8 +64,8 @@ for direction in dirdegs_dict.keys():
     future_ids = []
     retry_ids = []
     exec(open(os.path.join(code_dir, 'get_works.py')).read())
-    if len(retry_ids) > 0:
-      next_ids = retry_ids
+    while len(retry_ids) > 0:
+      next_ids = [retry_ids.pop()]
       exec(open(os.path.join(code_dir, 'get_works.py')).read())
     # Concatenate results from each work
     files = list_files(directory=working_dir, file_extension = '.txt')
